@@ -1,0 +1,1 @@
+.\testing.o: testing.s

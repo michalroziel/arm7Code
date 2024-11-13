@@ -1,0 +1,61 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             MyCode, CODE, READONLY ; Defini
+                                                            ert den Codebereich
+                                                            
+    2 00000000                 EXPORT           _start      ; Exportiert den St
+                                                            artpunkt für den Li
+                                                            nker
+    3 00000000         
+    4 00000000         _start                               ; Startpunkt des Pr
+                                                            ogramms
+    5 00000000 E3A00005        MOV              R0, #5      ; Lade die Zahl 5 i
+                                                            n Register R0
+    6 00000004 E3A0100A        MOV              R1, #10     ; Lade die Zahl 10 
+                                                            in Register R1
+    7 00000008 E0802001        ADD              R2, R0, R1  ; Addiere die Werte
+                                                             in R0 und R1 und s
+                                                            peichere das Ergebn
+                                                            is in R2
+    8 0000000C         
+    9 0000000C         ; Optional: Beenden des Programms (Linux exit syscall)
+   10 0000000C E3A07001        MOV              R7, #1      ; Linux-Systemaufru
+                                                            fnummer für exit
+   11 00000010 E3A00000        MOV              R0, #0      ; Rückgabewert 0
+   12 00000014 EF000000        SWI              0           ; Software-Interrup
+                                                            t für den Systemauf
+                                                            ruf
+   13 00000018         
+   14 00000018                 END                          ; Markiert das Ende
+                                                             des Programms
+Command Line: --debug --xref --bi --apcs=interwork --depend=.\easy.d -o.\easy.o
+ -IC:\Keil\ARM\RV31\INC -IC:\Keil\ARM\CMSIS\Include --predefine="__EVAL SETA 1"
+ --list=.\easy.lst easy.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+MyCode 00000000
+
+Symbol: MyCode
+   Definitions
+      At line 1 in file easy.s
+   Uses
+      None
+Comment: MyCode unused
+_start 00000000
+
+Symbol: _start
+   Definitions
+      At line 4 in file easy.s
+   Uses
+      At line 2 in file easy.s
+Comment: _start used once
+2 symbols
+333 symbols in table
