@@ -1,2 +1,0 @@
-Dependencies for Project 'testing', Target 'Target 1': (DO NOT MODIFY !)
-F (.\easy.s)(0x6734F9CE)(--cpu ARM7TDMI --bi --pd "__EVAL SETA 1" -g --apcs=interwork -I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include--list .\easy.lst --xref -o .\easy.o --depend .\easy.d)
