@@ -40,12 +40,7 @@ Reset_Handler	MSR			CPSR_c, #0x10	; User Mode aktivieren
 	
 				LDR R0, =Zahl   ; Lade die Adresse der Zahl
 				LDR	R0, [R0]	; Lade die Zahl aus der Adresse 
-				
 				MOV R1, #5
-				MOV R3, #0
-				
-				CMP R1, #0x00
-				BEQ endlos
 				
 				BL 	Berechnung
 				
@@ -61,30 +56,32 @@ endlos			B			endlos
 Berechnung
 
 
-JUMP                
-                        ;*** Jetzt durch 5 teilen -> Divident in RO
-						
-						CMP R0, R1	; Vergleiche Divident und Divisor ! 
-						BMI FERTIG	; Wenn N-Flag gesetzt ist, springe zum Label fertig 
-						SUB R0, R0, R1 ; Subtrahiere den Divisor von dem Divident 
-						ADD R2, R2, #1 ; Inkrementiere den Quotienten um 1 
-						B JUMP			; Bedingungs-unabhängiger Jump
+	; DIE ZAHL ITS IN R0 
+; Assume the dividend is in R0
+; The result will be in R6
+; Perform division using shifts and subtraction
 
-FERTIG
-                        MOV R7, R0      ; Rest der Übrig bleibt
-                        MOV R6, R2      ; Quotient
+
+	MOV R5, R0          ; Copy the original number (R0) to R5
+    MOV R6, #51         ; Load the constant (scaled factor for 1/5)
+    MUL R4, R5, R6      ; Multiply R0 by the scaled factor (R4 = R0 * 51)
+    ADD R4, R4, #128    ; Add bias for rounding (128 = 2^7)
+    ASR R4, R4, #8      ; Arithmetic shift right by 8 (divide by 256)
+
+					
 						
+
+
 						
 						; X/5 WURDE BERECHNET 
 						; JETZT : MIT 2 MULT 
 						
-						LSL R6, R6, #1 
+						LSL R4, R4, #1 
 						
-						; 2/5 * X WURDE BERECHNET 
-						; JETZT alles hoch 2 
+					
 						; DA GILT : X < 2°16 : Wir können MUL benutzen 
 	
-						MUL R8, R6, R6 
+						MUL R8, R4, R4 
 						
 		
 						BX LR
