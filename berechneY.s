@@ -62,26 +62,17 @@ Berechnung
 ; Perform division using shifts and subtraction
 
 
-	MOV R5, R0          ; Copy the original number (R0) to R5
-    MOV R6, #51         ; Load the constant (scaled factor for 1/5)
-    MUL R4, R5, R6      ; Multiply R0 by the scaled factor (R4 = R0 * 51)
-    ADD R4, R4, #128    ; Add bias for rounding (128 = 2^7)
-    ASR R4, R4, #8      ; Arithmetic shift right by 8 (divide by 256)
-
-					
-						
-
+						LDR R1, =0xCCCCCCCD
+						UMULL R2, R3, R0, R1
+						MOV  R0, R3, LSR #2
 
 						
-						; X/5 WURDE BERECHNET 
-						; JETZT : MIT 2 MULT 
-						
-						LSL R4, R4, #1 
+						LSL R0, R0, #1 
 						
 					
 						; DA GILT : X < 2°16 : Wir können MUL benutzen 
 	
-						MUL R8, R4, R4 
+						MUL R8, R0, R0
 						
 		
 						BX LR
