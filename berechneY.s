@@ -86,7 +86,7 @@ berechnung
 
 
 					 LSL R0, R0, #1 
-					 MUL R8, R0, R0
+					 MUL R0, R0, R0			; changed Return R8 to R0
 					 BX LR
 				
 uitoa
