@@ -10,7 +10,9 @@
 ;* Aufgabe-Nr.:         	*	          1     						*
 ;*              			*						    			*
 ;********************************************************************
+
 ;* Gruppen-Nr.: 			*				5						*
+
 ;*              			*										*
 ;********************************************************************
 ;* Name / Matrikel-Nr.: 	*		Valentin Straßer	5014379						*
@@ -42,6 +44,7 @@ Reset_Handler	MSR			CPSR_c, #0x10	; User Mode aktivieren
 ;********************************************************************
 ;* Hier das eigene (Haupt-)Programm einfuegen   					*
 ;********************************************************************
+
 
 						LDR			SP,=Top_Stack 		; Adresse des Werts laden
 						LDR	   		R0,=STR_1			; Wert laden
@@ -81,6 +84,7 @@ berechnung
 					 UMULL R2, R3, R0, R1
 					 MOV  R0, R3, LSR #2
 
+
 					 LSL R0, R0, #1 
 					 MUL R8, R0, R0
 					 BX LR
@@ -113,6 +117,7 @@ revstr
 				  
 			          LDMFD SP!, {R2-R7, R14}	;Lade urspruengliche Registerbelegung
 			          BX LR
+
 
 ;********************************************************************
 ;* Konstanten im CODE-Bereich                                       *
