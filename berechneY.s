@@ -10,9 +10,7 @@
 ;* Aufgabe-Nr.:         	*	          1     						*
 ;*              			*						    			*
 ;********************************************************************
-
 ;* Gruppen-Nr.: 			*				5						*
-
 ;*              			*										*
 ;********************************************************************
 ;* Name / Matrikel-Nr.: 	*		Valentin Straßer	5014379						*
@@ -31,7 +29,7 @@ STR_1 			  	EQU Datenanfang +0x100
 	
 Stack_Anfang	EQU Datenanfang + 0x300
 Top_Stack 		EQU Stack_Anfang + 0x100
-STR_2			EQU Top_Stack 
+STR_2			EQU Top_Stack +100
 
 
 ;********************************************************************
@@ -45,11 +43,13 @@ Reset_Handler	MSR			CPSR_c, #0x10	; User Mode aktivieren
 ;* Hier das eigene (Haupt-)Programm einfuegen   					*
 ;********************************************************************
 
-
 						LDR			SP,=Top_Stack 		; Adresse des Werts laden
-						LDR	   		R0,=STR_1			; Wert laden
+						LDR	   		R0,=String_1			; Wert laden
+						LDR			R9,=0x0000FFFF
 						BL	atouI
+						AND	R0,R0,R9
 						BL berechnung
+						AND	R0,R0,R9
 						LDR			R1,=STR_2
 						BL	uitoa
 
@@ -84,45 +84,46 @@ berechnung
 					 UMULL R2, R3, R0, R1
 					 MOV  R0, R3, LSR #2
 
-
 					 LSL R0, R0, #1 
-					 MUL R0, R0, R0			; changed Return R8 to R0
+					 MUL R8, R0, R0
+					 MOV R0,R8
 					 BX LR
 				
 uitoa
-					STMFD SP!,{R2-R7,R14} ;Registerbelegung retten
-				    MOV r2,#10 ; für mal 10
-				    LDR r3,=0xCCCCCCCD ;Magic number
-					MOV r4,#0 ; zähler
-schleife_uitoa
-			           CMP		R0,#0				;Ist R4 == 0?
-				   MOVNE		R5,R0				;Lade Wert von R0 nach R5
-                  	           UMULLNE   r6, r0, r5, r3   ; // Multiply number (r0) by magic number, store high result in r1
-				   LSRNE     r0, r0, #19       ;// Shift right to get quotient in r1
-				   MULNE     r6, r0, r2       ;// Multiply quotient by 10
-				   SUBNE     r5, r5, r6        ;// Subtract (Quotient * 10) from original number to get remainder
+					STMFD SP!, {R2-R7, LR}   ; Save registers
+					MOV   R2, #10            ; Base (10) for division
+					LDR   R3, =0x1999A       ; Magic number for division by 10 (16-bit optimization)
+					MOV   R4, #0             ; Digit count
 
-				   ADDNE	R5,#0x30			; Nein: Zahl in R6 um #0x30 Hochaddieren um die Hex-Zahl zur Ausgabe zu erhalten
-				   STMFDNE	SP!,{R5}
-				   ADDNE	R4,R4,#1			; Nein: Erhoehe Zeichenzaehler R7 um 1	   
-				   BNE		schleife_uitoa				; Nein: Ruecksprung
+schleife
+					CMP   R0, #0             ; Check if the number is zero
+					UMULLNE R6, R5, R0, R3     ; Multiply with the magic number
+					MOVNE   R5, R6, LSR #20    ; Adjust quotient (shift right by 20 for 16-bit precision)
+					MULNE   R6, R5, R2         ; R6 = R5 * 10
+					SUBNE   R6, R0, R6         ; R6 = R0 - (R5 * 10), gives remainder
+					ADDNE   R6, #0x30          ; Convert remainder to ASCII ('0'-'9')
+					STMFDNE SP!, {R6}          ; Push character to stack
+					MOVNE   R0, R5             ; Update R0 for next iteration
+					ADDNE   R4, R4, #1         ; Increment digit counter
+					BNE     schleife
+
 revstr
-				  MOV R3,#0x00
-				  CMP	R4,#0
-				  LDMFDNE SP!,{R5}
-				  STRBNE R5,[R1],#1
-				  SUBNE	R4, R4, #1
-				  BNE	revstr
-				  STRB R3,[R1]
-				  
-			          LDMFD SP!, {R2-R7, R14}	;Lade urspruengliche Registerbelegung
-			          BX LR
+					CMP   R4, #0
+					LDMFDNE SP!, {R6}        ; Pop characters from stack
+					STRBNE R6, [R1], #1      ; Write characters to memory, increment pointer
+					SUBNE R4, R4, #1         ; Decrement counter
+					BNE   revstr
 
+					MOV   R3, #0x00          ; Null terminator
+					STRB  R3, [R1]           ; Write null terminator
+
+					LDMFD SP!, {R2-R7, LR}   ; Restore registers
+					BX    LR                 ; Return
 
 ;********************************************************************
 ;* Konstanten im CODE-Bereich                                       *
 ;********************************************************************
-String_1		DCB		"100",0x00
+String_1		DCB		"123",0x00
 ;********************************************************************
 ;* Ende der Programm-Quelle                                         *
 ;********************************************************************
