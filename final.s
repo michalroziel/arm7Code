@@ -14,11 +14,11 @@
 ;*              			*										*
 ;********************************************************************
 ;* Name / Matrikel-Nr.: 	*		Valentin Straßer	5014379						*
-;*							*		Michal Roziel		5012845				*
-;*							*										*
+;*									*		Michal Roziel		5012845				*
+;*									*										*
 ;********************************************************************
 ;* Abgabedatum:         	*          19.12.2024    							*
-;*							*										*
+;*									*										*
 ;********************************************************************
 ;********************************************************************
 ;* Daten-Bereich bzw. Daten-Speicher				            	*
@@ -54,63 +54,69 @@ endlos					    B						endlos
 ;* ab hier Unterprogramme                                           *
 ;********************************************************************
 atouI
-								STMFD 			SP!, {R1-R4, R14}							;bisherige Register retten
-								MOV		        R2,#10											;R2 sei 10; die 10 wird benötigt um Platz zu schaffen
-								MOV				R3,#0											;R3 sei am Startpunkt 0		  
+								STMFD       		SP!, {R1-R4, R14}           			    ; Speichere Register R1-R4 und Rücksprungadresse auf dem Stack
+								MOV         		R2, #10                      					; R2 = 10 (Basis für Dezimalberechnung)
+								MOV         		R3, #0                       					; R3 = 0 (Startwert für die Berechnung)
+
 schleife_atouI
-								LDRB		 		R1,[R0],#1									;Lade xtes Zeichen von String in R1, inkrementiere R0 um 
-								MOV				R4,R3
-								CMP					R1,#0x00										;Ust R1 == 0?
-								SUBNE				R1,R1,#0x30									; Nein: dekremetiere R1 um 0x30 um die tatsächliche Hex-Zahl zu erhalten 
-								MLANE				R3,R4,R2,R1									; Nein: Multipliziere das alte Erg mit 10, Addiere die neue Hex-Zahl hinzu, Speichere in R3
-								BNE 				schleife_atouI								; Nein: wiederhole Schleife 
-								MOV				R0,R4											;Schreibe Endergebnis nach R
-								LDMFD 			SP!, {R1-R4, R14}							;Lade urspruengliche Registerbelegung
-								BX 					LR
+								LDRB        		R1, [R0], #1                					; Lade aktuelles Zeichen aus der Speicheradresse R0, R0++
+								MOV         		R4, R3                       					; Speichere bisherigen Wert von R3 in R4
+								CMP         		R1, #0x00                    					; Prüfe, ob Ende der Zeichenkette erreicht (Null-Terminator)
+								SUBNE      		R1, R1, #0x30                				; Falls nicht, konvertiere ASCII-Zeichen in Dezimalwert
+								MLANE      		R3, R4, R2, R1              				; Multipliziere bisherigen Wert mit 10 und addiere neuen Wert
+								BNE         		schleife_atouI               					; Wiederhole, falls noch Zeichen übrig
+
+								MOV         		R0, R4                       					; Speichere Endergebnis in R0
+								LDMFD       		SP!, {R1-R4, R14}           				; Wiederherstellen der ursprünglichen Registerwerte
+								BX          			LR                          						; Rückkehr zur aufrufenden Funktion
+
 berechnung
-							    MOV     			R0, R0, LSL #16    						; Linksschieben der unteren 16 Bits in die oberen 16 Bits
-								ASR    				R0, R0, #16        							; Arithmetisches Rechtsschieben, um das Vorzeichen-Bit zu übernehmen
-								CMP      			R0, #0             								; Compare R0 (X) with 0
-								RSBMI   			R0, R0, #0         							; If R0 is negative (MI), reverse subtract it from 0 to make it positive
+								MOV         		R0, R0, LSL #16              				; Verschiebe die unteren 16 Bits nach oben
+								ASR         		R0, R0, #16                  					; Verschiebe arithmetisch nach rechts (übernimmt Vorzeichen)
+								CMP        		    R0, #0                      					; Prüfe, ob die Zahl negativ ist
+								RSBMI       		R0, R0, #0                   					; Falls negativ, mache sie positiv
 
-								MOV     			R1, R0             								; R1 = X
-								MOV     			R2, R1, LSL #1    							; R2 = 2 * X (left shift by 1)
+								MOV         		R1, R0                       					; R1 = Eingabewert (X)
+								MOV         		R2, R1, LSL #1             					; R2 = 2 * X (Linksschieben um 1 Bit)
 
-							 	LDR    			   R1, =0xCCCCCCCD    					; Load the magic number 0xCCCCCCCD into R1
-								UMULL   		   R3, R4, R2, R1     							; Unsigned multiply: R2 * 0xCCCCCCCD
-								MOV     		   R2, R4, LSR #2   						    ; R2 = R4 >> 2 (divide high result by 2^2)
+								LDR        			R1, =0xCCCCCCCD            			; Lade Magic Number für Division durch 10
+								UMULL       		R3, R4, R2, R1               				; R2 * Magic Number -> Ergebnis in R3:R4
+								MOV         		R2, R4, LSR #2              				; Teile Ergebnis (R4) durch 4 (Rechtsverschiebung um 2 Bits)
 
-								MUL     		   R0, R2, R2         							; R0 = R2 * R2 (square the result)    
-								BX 				   LR			
+								MUL         		R0, R2, R2                   					; Quadriere das Ergebnis (R0 = R2 * R2)
+								BX          			LR                           						; Rückkehr zur aufrufenden Funktion
+		
 uitoa
-								STMFD 		   SP!, {R2-R7, LR}  							; Save registers
-								MOV   			   R2, #10            								; Base (10) for division
-								LDR   			   R3, =0x1999A      							; Magic number for division by 10 (16-bit optimization)
-								MOV   			   R4, #0            								; Digit count
+								STMFD       		SP!, {R2-R7, LR}            					    ; Speichere Register R2-R7 und Rücksprungadresse
+								MOV         		R2, #10                    						    ; Basis (10) für Division
+								LDR         			R3, =0x1999A               						    ; Magic Number für Division durch 10
+								MOV            	R4, #0                       							; Zähler für die Anzahl der Ziffern
 
 schleife
-								CMP   			   R0, #0             								; Check if the number is zero
-								UMULLNE 	   R6, R5, R0, R3    							; Multiply with the magic number
-								MOVNE   		   R5, R6, LSR #20    						; Adjust quotient (shift right by 20 for 16-bit precision)
-								MULNE   		   R6, R5, R2         							; R6 = R5 * 10
-								SUBNE            R6, R0, R6         							; R6 = R0 - (R5 * 10), gives remainder
-								ADDNE            R6, #0x30          							; Convert remainder to ASCII ('0'-'9')
-								STMFDNE       SP!, {R6}         								; Push character to stack
-								MOVNE           R0, R5            								; Update R0 for next iteration
-								ADDNE            R4, R4, #1         							; Increment digit counter
-								BNE     	       schleife
+								CMP        			R0, #0                      							; Prüfe, ob der Wert 0 ist
+								UMULLNE    		R6, R5, R0, R3             					    ; Multipliziere mit der Magic Number
+								MOVNE       		R5, R6, LSR #20             					; Quotient ausrechnen (Rechtsverschiebung um 20 Bits)
+								MULNE       		R6, R5, R2                 							; R6 = R5 * 10
+								SUBNE       		R6, R0, R6                  						; Rest berechnen (R6 = R0 - (R5 * 10))
+								ADDNE     	    R6, #0x30                   						; Umwandeln in ASCII ('0'-'9')
+								STMFDNE     	SP!, {R6}                   						; Speichere das Zeichen auf dem Stack
+								MOVNE       		R0, R5                      							; Aktualisiere R0 für nächste Iteration
+								ADDNE       		R4, R4, #1                  					    ; Zähler erhöhen
+								BNE         		schleife                    								; Wiederhole, falls noch Ziffern übrig
+
 revstr
-								CMP  			   R4, #0
-								LDMFDNE 	   SP!, {R6}        								; Pop characters from stack
-								STRBNE  		   R6, [R1], #1     								; Write characters to memory, increment pointer
-								SUBNE 		   R4, R4, #1         							; Decrement counter
-								BNE   			   revstr
+								CMP       		 		R4, #0                       							; Prüfe, ob noch Zeichen vorhanden sind
+								LDMFDNE        SP!, {R6}                 						    ; Hole Zeichen vom Stack
+								STRBNE          R6, [R1], #1                						; Schreibe Zeichen in Speicher, R1++
+								SUBNE            R4, R4, #1                   						; Zähler verringern
+								BNE        		   revstr                       								; Wiederhole, bis alle Zeichen verarbeitet sind
 
-								MOV   			   R3, #0x00          							; Null terminator
-								STRB 			   R3, [R1]           								; Write null terminator
+								MOV       			R3, #0x00                   							; Null-Terminator
+								STRB        	 R3, [R1]                    							; Schreibe Null-Terminator ans Ende
 
-								LDMFD 		   SP!, {R2-R7, LR}   							; Restore registers
-								BX   			   LR                									; Return
+								LDMFD       SP!, {R2-R7, LR}             					; Wiederherstellen der ursprünglichen Registerwerte
+								BX          LR                          								; Rückkehr zur aufrufenden Funktion
+
 ;********************************************************************
 ;* Konstanten im CODE-Bereich                                       *
 ;********************************************************************
