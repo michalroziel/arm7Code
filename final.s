@@ -23,12 +23,12 @@
 ;********************************************************************
 ;* Daten-Bereich bzw. Daten-Speicher				            	*
 ;********************************************************************
-								AREA   			Daten, DATA, READWRITE  			; Define a writable data area
+								AREA   			Daten, DATA, READWRITE  			
 Datenanfang
 STR_1 			  			EQU 				Datenanfang +0x100
 Stack_Anfang			EQU 				Datenanfang + 0x300
 Top_Stack 				EQU 				Stack_Anfang + 0x400
-STR_2			    		EQU 				Top_Stack +0x100
+STR_2			    		EQU 				Top_Stack +100
 ;********************************************************************
 ;* Programm-Bereich bzw. Programm-Speicher							*
 ;********************************************************************
@@ -87,32 +87,31 @@ berechnung
 								BX          			LR                           						; Rückkehr zur aufrufenden Funktion
 		
 uitoa
-								STMFD       		SP!, {R2-R7, LR}            					    ; Speichere Register R2-R7 und Rücksprungadresse
-								MOV         		R2, #10                    						    ; Basis (10) für Division
-								LDR         			R3, =0x1999A               						    ; Magic Number für Division durch 10
-								MOV            	R4, #0                       							; Zähler für die Anzahl der Ziffern
+								STMFD       		SP!, {R2-R7, LR}            				; Speichere Register R2-R7 und Rücksprungadresse
+								MOV         		R2, #10                    						; Basis (10) für Division
+								LDR         			R3, =0xCCCD              				    ; Magic Number für Division durch 10
+								MOV            	R4, #0                       				    ; Zähler für die Anzahl der Ziffern
 
 schleife
-								CMP        			R0, #0                      							; Prüfe, ob der Wert 0 ist
-								UMULLNE    		R6, R5, R0, R3             					    ; Multipliziere mit der Magic Number
-								MOVNE       		R5, R6, LSR #20             					; Quotient ausrechnen (Rechtsverschiebung um 20 Bits)
-								MULNE       		R6, R5, R2                 							; R6 = R5 * 10
-								SUBNE       		R6, R0, R6                  						; Rest berechnen (R6 = R0 - (R5 * 10))
-								ADDNE     	    R6, #0x30                   						; Umwandeln in ASCII ('0'-'9')
-								STMFDNE     	SP!, {R6}                   						; Speichere das Zeichen auf dem Stack
-								MOVNE       		R0, R5                      							; Aktualisiere R0 für nächste Iteration
-								ADDNE       		R4, R4, #1                  					    ; Zähler erhöhen
-								BNE         		schleife                    								; Wiederhole, falls noch Ziffern übrig
-
+								CMP        			R0, #0                      				    ; Prüfe, ob der Wert 0 ist
+								UMULLNE    		R6, R5, R0, R3             					; Multipliziere mit der Magic Number
+								MOVNE       		R5, R6, LSR #19            				; Quotient ausrechnen (Rechtsverschiebung um 19 Bits)
+								MULNE       		R6, R5, R2                 					; R6 = R5 * 10
+								SUBNE       		R6, R0, R6                  					; Rest berechnen (R6 = R0 - (R5 * 10))
+								ADDNE     	    R6, #0x30                   					; Umwandeln in ASCII ('0'-'9')
+								STMFDNE     	SP!, {R6}                   					; Speichere das Zeichen auf dem Stack
+								MOVNE       		R0, R5                      					; Aktualisiere R0 für nächste Iteration
+								ADDNE       		R4, R4, #1                  					; Zähler erhöhen
+								BNE         		schleife                    						; Wiederhole, falls noch Ziffern übrig
 revstr
-								CMP       		 		R4, #0                       							; Prüfe, ob noch Zeichen vorhanden sind
-								LDMFDNE        SP!, {R6}                 						    ; Hole Zeichen vom Stack
-								STRBNE          R6, [R1], #1                						; Schreibe Zeichen in Speicher, R1++
-								SUBNE            R4, R4, #1                   						; Zähler verringern
-								BNE        		   revstr                       								; Wiederhole, bis alle Zeichen verarbeitet sind
+								CMP       		 		R4, #0                       				; Prüfe, ob noch Zeichen vorhanden sind
+								LDMFDNE        SP!, {R6}                 						; Hole Zeichen vom Stack
+								STRBNE          R6, [R1], #1                					; Schreibe Zeichen in Speicher, R1++
+								SUBNE            R4, R4, #1                   					; Zähler verringern
+								BNE        		   revstr                       						; Wiederhole, bis alle Zeichen verarbeitet sind
 
-								MOV       			R3, #0x00                   							; Null-Terminator
-								STRB        	 R3, [R1]                    							; Schreibe Null-Terminator ans Ende
+								MOV       			R3, #0x00                   					; Null-Terminator
+								STRB        	 R3, [R1]                    						; Schreibe Null-Terminator ans Ende
 
 								LDMFD       SP!, {R2-R7, LR}             					; Wiederherstellen der ursprünglichen Registerwerte
 								BX          LR                          								; Rückkehr zur aufrufenden Funktion
