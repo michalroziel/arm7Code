@@ -28,7 +28,7 @@ Datenanfang
 STR_1 			  				EQU 				Datenanfang +0x100
 Stack_Anfang					EQU 				Datenanfang + 0x300
 Top_Stack 						EQU 				Stack_Anfang + 0x400
-STR_2			    			EQU 				Top_Stack +100
+STR_2			    			EQU 				Top_Stack
 ;********************************************************************
 ;* Programm-Bereich bzw. Programm-Speicher							*
 ;********************************************************************
@@ -38,14 +38,15 @@ Reset_Handler		      		MSR					CPSR_c, #0x10    ; User Mode aktivieren
 ;********************************************************************
 ;* Hier das eigene (Haupt-)Programm einfuegen   					*
 ;********************************************************************
-			LDR					SP,=Top_Stack 		 ; Adresse des Werts laden
-			LDR	   				R0,=STR_1			 ; Wert laden
-			LDR					R9,=0x0000FFFF
-			BL					atouI
-			AND					R0,R0,R9
-			BL 					berechnung
-			LDR					R1,=STR_2
-			BL					uitoa
+	LDR					SP,=Top_Stack 		 ; Adresse des Werts laden
+	LDR	   				R0,=String_1		 ; Wert laden
+	LDR					R9,=0x0000FFFF       ; Zur Sicherheit : Begrenzung auf 16 Bits 
+	BL					atouI
+	AND					R0,R0,R9
+	BL 					berechnung
+	AND					R0,R0,R9			 ; Zur Sicherheit : Begrenzung auf 16 Bits 
+	LDR					R1,=STR_2
+	BL					uitoa
 ;********************************************************************
 ;* Ende des eigenen (Haupt-)Programms                               *
 ;********************************************************************
@@ -79,7 +80,7 @@ berechnung
 			MOV         		R1, R0               ; R1 = Eingabewert (X)
 			MOV         		R2, R1, LSL #1       ; R2 = 2 * X (Linksschieben um 1 Bit)
 
-			LDR        			R1, =0xCCCCCCCD      ; Lade Magic Number für Division durch 10
+			LDR        			R1, =0xCCCCCCCD      ; Lade Magic Number für Division durch 10 -> Skript
 			UMULL       		R3, R4, R2, R1       ; R2 * Magic Number -> Ergebnis in R3:R4
 			MOV         		R2, R4, LSR #2       ; Teile Ergebnis (R4) durch 4 (Rechtsverschiebung um 2 Bits)
 
@@ -94,8 +95,8 @@ uitoa
 
 schleife
 			CMP        			R0, #0               ; Prüfe, ob der Wert 0 ist
-			UMULLNE    			R6, R5, R0, R3       ; Multipliziere mit der Magic Number
-			MOVNE       		R5, R6, LSR #19      ; Quotient ausrechnen (Rechtsverschiebung um 19 Bits)
+			MULNE    			R6, R0, R3           ; Multipliziere mit der Magic Number
+			MOVNE       		R5, R6, LSR #19      ; Quotient ausrechnen (Rechtsverschiebung um 19 Bit)
 			MULNE       		R6, R5, R2           ; R6 = R5 * 10
 			SUBNE       		R6, R0, R6           ; Rest berechnen (R6 = R0 - (R5 * 10))
 			ADDNE     	   		R6, #0x30            ; Umwandeln in ASCII ('0'-'9')
@@ -119,7 +120,7 @@ revstr
 ;********************************************************************
 ;* Konstanten im CODE-Bereich                                       *
 ;********************************************************************
-String_1				       DCB				   "65036",0x00
+String_1				       DCB				   "256",0x00
 ;********************************************************************
 ;* Ende der Programm-Quelle                                         *
 ;********************************************************************
