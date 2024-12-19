@@ -23,37 +23,45 @@
 ;********************************************************************
 ;* Daten-Bereich bzw. Daten-Speicher				            	*
 ;********************************************************************
-			AREA   				Daten, DATA, READWRITE  			
+						AREA   				Daten, DATA, READWRITE  			
 Datenanfang
-STR_1 			  				EQU 				Datenanfang +0x100
-Stack_Anfang					EQU 				Datenanfang + 0x300
-Top_Stack 						EQU 				Stack_Anfang + 0x400
-STR_2			    			EQU 				Top_Stack
+STR_1 			  		EQU 				Datenanfang  + 0x100
+Stack_Anfang			EQU 				Datenanfang  + 0x200
+Top_Stack 				EQU 				Stack_Anfang + 0x400
+STR_2			    	EQU 				Top_Stack
 ;********************************************************************
 ;* Programm-Bereich bzw. Programm-Speicher							*
 ;********************************************************************
-			AREA				Programm, CODE, READONLY
-			ARM
-Reset_Handler		      		MSR					CPSR_c, #0x10    ; User Mode aktivieren
+						AREA				Programm, CODE, READONLY
+						ARM
+Reset_Handler		    MSR					CPSR_c, #0x10  
 ;********************************************************************
 ;* Hier das eigene (Haupt-)Programm einfuegen   					*
 ;********************************************************************
-	LDR					SP,=Top_Stack 		 ; Adresse des Werts laden
-	LDR	   				R0,=String_1		 ; Wert laden
-	LDR					R9,=0x0000FFFF       ; Zur Sicherheit : Begrenzung auf 16 Bits 
-	BL					atouI
-	AND					R0,R0,R9
-	BL 					berechnung
-	AND					R0,R0,R9			 ; Zur Sicherheit : Begrenzung auf 16 Bits 
-	LDR					R1,=STR_2
-	BL					uitoa
+			LDR					SP,=Top_Stack 		 ; Adresse des Werts laden
+			LDR	   				R0,=STR_1		     ; Wert laden
+			LDR					R9,=0x0000FFFF       ; Zur Sicherheit : Begrenzung auf 16 Bits 
+			BL					atouI
+			AND					R0,R0,R9
+			BL 					berechnung
+			AND					R0,R0,R9			 ; Zur Absicherung : Begrenzung auf 16 Bits 
+			LDR					R1,=STR_2
+			BL					uitoa
 ;********************************************************************
 ;* Ende des eigenen (Haupt-)Programms                               *
 ;********************************************************************
-endlos					   		 B					endlos
+endlos	    B				    endlos
 ;********************************************************************
 ;* ab hier Unterprogramme                                           *
 ;********************************************************************
+
+
+;********************************************************************************************************		
+; Aufgabe 2.1 ATOUI - ASCII ZU UNSIGNED INTEGER
+; Eingabe : R0, Adresse des ersten Zeichens des Strings - STR_1 bei 0x40000000
+; Ausgabe : R0 - konvertiert in 32 Bit Unsigned Integer Zahl
+;********************************************************************************************************
+
 atouI
 			STMFD       		SP!, {R1-R4, R14}    ; Speichere Register R1-R4 und Rücksprungadresse auf dem Stack
 			MOV         		R2, #10              ; R2 = 10 (Basis für Dezimalberechnung)
@@ -70,8 +78,16 @@ schleife_atouI
 			MOV         		R0, R4               ; Speichere Endergebnis in R0
 			LDMFD       		SP!, {R1-R4, R14}    ; Wiederherstellen der ursprünglichen Registerwerte
 			BX          		LR                   ; Rückkehr zur aufrufenden Funktion
+			
+;********************************************************************************************************		
+; Aufgabe 4.2 Berechne Y = ((2/5) X) ZUM QUADRAT
+; Eingabe : R0, 16 Bit Signed ganze Zahl 
+; Ausgabe : R0 - Funktionswert Y 
+;********************************************************************************************************
 
 berechnung
+			
+			STMFD       		SP!, {R1-R4, LR}     ; Speichere Register R1-R4 und Rücksprungadresse
 			MOV         		R0, R0, LSL #16      ; Verschiebe die unteren 16 Bits nach oben
 			ASR         		R0, R0, #16          ; Verschiebe arithmetisch nach rechts (übernimmt Vorzeichen)
 			CMP        		    R0, #0               ; Prüfe, ob die Zahl negativ ist
@@ -86,6 +102,13 @@ berechnung
 
 			MUL         		R0, R2, R2           ; Quadriere das Ergebnis (R0 = R2 * R2)
 			BX          		LR                   ; Rückkehr zur aufrufenden Funktion
+			LDMFD               SP!, {R1-R4, LR}     ; Wiederherstellen der ursprünglichen Registerwerte
+			
+;********************************************************************************************************		
+; Aufgabe 4.3 UNSIGNED INTEGER ZU ASCII
+; Eingabe : R0, 16 Bit Unsigned ganze Zahl , R1 - Adresse für das erste Zeichen des zu erzeugenden Strings - STR_2
+; Ausgabe : ASCII konvertierte Zahl an der Adresse von STR_2
+;*********************************************************************************************************
 
 uitoa
 			STMFD       		SP!, {R2-R7, LR}     ; Speichere Register R2-R7 und Rücksprungadresse
@@ -93,7 +116,7 @@ uitoa
 			LDR         		R3, =0xCCCD          ; Magic Number für Division durch 10
 			MOV              	R4, #0               ; Zähler für die Anzahl der Ziffern
 
-schleife
+schleife_uitoa
 			CMP        			R0, #0               ; Prüfe, ob der Wert 0 ist
 			MULNE    			R6, R0, R3           ; Multipliziere mit der Magic Number
 			MOVNE       		R5, R6, LSR #19      ; Quotient ausrechnen (Rechtsverschiebung um 19 Bit)
@@ -103,7 +126,7 @@ schleife
 			STMFDNE     		SP!, {R6}            ; Speichere das Zeichen auf dem Stack
 			MOVNE       		R0, R5               ; Aktualisiere R0 für nächste Iteration
 			ADDNE       		R4, R4, #1           ; Zähler erhöhen
-			BNE         		schleife             ; Wiederhole, falls noch Ziffern übrig
+			BNE         		schleife_uitoa             ; Wiederhole, falls noch Ziffern übrig
 revstr
 			CMP       		    R4, #0               ; Prüfe, ob noch Zeichen vorhanden sind
 			LDMFDNE             SP!, {R6}            ; Hole Zeichen vom Stack
@@ -120,7 +143,7 @@ revstr
 ;********************************************************************
 ;* Konstanten im CODE-Bereich                                       *
 ;********************************************************************
-String_1				       DCB				   "256",0x00
+String_1				       DCB				   "65535",0x00
 ;********************************************************************
 ;* Ende der Programm-Quelle                                         *
 ;********************************************************************
