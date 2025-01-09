@@ -27,7 +27,7 @@
 
 #define SEGMENT 0x1FC0000
 #define LED 		0xFF0000
-#define S				0x30000
+#define S				0x0
 
 
 #define LED_MASK 0xFF0000  // LEDs sind an P0.16-P0.23 angeschlossen
@@ -114,7 +114,7 @@ while(1) {
     schalter = (IOPIN0 & 0x10000) >> 16;
     
  
-    eingabe = (IOPIN0 >> 10) & 0xf;  // Zuweisung
+    eingabe = (IOPIN0 >> 10) & 0xF;  // Zuweisung
     
     if (eingabe > 9) eingabe = 9;  // Eingabe begrenzen
     
@@ -122,31 +122,26 @@ while(1) {
         IOSET0 = bcd[eingabe];  // Setzt High-Spannungspegel am BCD
     }
 
+	schalter = (IOPIN0  & 0x20000)>>16;
+
+    if ( schalter ){
+	
+		ledLaufIndex  = (ledLaufIndex<< 1) + 1  ;				
 		
-		
-		
-		schalter = (IOPIN0  & 0x20000)>>16;
-		
-			if ( schalter ){
-			
-					ledLaufIndex  = (ledLaufIndex<< 1) + 1  ;				
-					
-			} 
-			
-			else {
-			
-			ledLaufIndex = 0;
-				
-			}
-		
-			
+	} 
+
+     else {
+
+    ledLaufIndex = 0;
+    IOCLR1=LED;												// Setzt Low-Spannungspegel an P0.16-P0.19
+	
+     }
+
+     if (ledLaufIndex > 0xFF) {
+        ledLaufIndex = 0;  // Zurücksetzen auf 0, wenn Grenze überschritten
+				IOCLR1=LED;												// Setzt Low-Spannungspegel an P0.16-P0.19
+    }
 
 			IOSET1=(ledLaufIndex<<16);								// Setzt Highspannungspegel an P0.16-P0.19
-			 
-			 
-
      }
 }
-
-
-
