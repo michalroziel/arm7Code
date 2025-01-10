@@ -68,16 +68,16 @@ const unsigned long BCD_CODES[10] = {
 volatile unsigned int ledPattern = 0;      // Aktuelles LED-Muster
 volatile unsigned int switchState = 0;
 
-// Prototypen
 void delay(void);
 void initLED(void);
 void initBCD(void);
 void initTimer(void);
 void setBCD(unsigned int value);
 void setLEDs(unsigned int pattern);
+void readSwitch(void);
+unsigned int readBCD(void);
 void T0isr(void) __irq;
 
-// Funktionen
 void delay(void) {
     T0TCR = 0x02;            // Timer zurücksetzen
     T0PR = PRESCALER - 1;    // Prescaler für 1 kHz
@@ -96,36 +96,37 @@ void initBCD(void) {
     IOCLR0 = SEGMENT_MASK;   // BCD-Anzeige löschen
 }
 
-void setBCD(unsigned int value) {
-    if (value > BCD_MAX) value = BCD_MAX; // Eingabe begrenzen
-    IOCLR0 = SEGMENT_MASK;                // Anzeige löschen
-    IOSET0 = BCD_CODES[value];            // Wert setzen
-}
-
 void setLEDs(unsigned int pattern) {
     IOCLR1 = LED_MASK;                   // Alle LEDs ausschalten
     IOSET1 = (pattern << 16);            // Muster setzen
 }
 
 void T0isr(void) __irq {
-
-		 // Überprüfung von Schalter 0x2
-        if (switchState & 0x2) {
-					
-					ledPattern = (ledPattern << 1) | 1; // Neues Bit hinzufügen
-    if (ledPattern > 0xFF) {
-        ledPattern = 0; // Alle LEDs ausschalten und zurücksetzen
-    }
-					
-					
-            setLEDs(ledPattern);
-        } else {
-            // Schalter aus: LEDs ausschalten und Muster speichern
-            setLEDs(0); // Alle LEDs ausschalten
-        }
-    // Timer-Interrupt-Flag zurücksetzen
+		if (switchState & 0x2) {
+				ledPattern = (ledPattern << 1) | 1; // Neues Bit hinzufügen
+		if (ledPattern > 0xFF) {
+				ledPattern = 0; // Alle LEDs ausschalten und zurücksetzen
+		}
+		setLEDs(ledPattern);
+		} else {
+				setLEDs(0); // Alle LEDs ausschalten
+		}
     T0IR = 0x01;
     VICVectAddr = 0x00; // Interrupt beendet
+}
+
+void readSwitch(void){
+	   switchState = (IOPIN0 & SWITCH_MASK) >> 16;
+}
+
+void setBCD(unsigned int value) {
+    if (value > BCD_MAX) value = BCD_MAX; // Eingabe begrenzen
+    IOCLR0 = SEGMENT_MASK;                // Anzeige löschen
+    IOSET0 = BCD_CODES[value];            // Wert setzen
+}
+
+unsigned int readBCD(void){
+	   return (IOPIN0 >> 10) & 0xF;
 }
 
 void initTimer(void) {
@@ -140,25 +141,15 @@ void initTimer(void) {
 }
 
 int main(void) {
-    unsigned int bcdInput = 0;
-
-    // Initialisierung
     initBCD();
     initLED();
     initTimer();
-
     while (1) {
-        // Schalterzustand einlesen
-        switchState = (IOPIN0 & SWITCH_MASK) >> 16;
-
-        // BCD-Anzeige aktualisieren
+        readSwitch();
         if (switchState & 0x1) {
-            bcdInput = (IOPIN0 >> 10) & 0xF; // Eingabe lesen
-            setBCD(bcdInput);
+            setBCD(readBCD());
         } else {
 					  IOCLR0 = SEGMENT_MASK;
-				}
-
-       
+				}   
     }
 }
