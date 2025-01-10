@@ -1,0 +1,7 @@
+--cpu ARM7TDMI
+".\startup.o"
+".\c_uebung.o"
+--strict --scatter ".\C_Uebung.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\C_Uebung.map" -o .\C_Uebung.axf
