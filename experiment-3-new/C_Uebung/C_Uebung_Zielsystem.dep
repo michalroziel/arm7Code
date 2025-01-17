@@ -1,0 +1,4 @@
+Dependencies for Project 'C_Uebung', Target 'Zielsystem': (DO NOT MODIFY !)
+F (.\Startup.s)(0x48D87BF0)(--cpu ARM7TDMI -g --apcs=interwork -I C:\Keil_ARM\ARM\RV31\INC-I C:\Keil_ARM\ARM\CMSIS\Include-I C:\Keil_ARM\ARM\Inc\Philips--list .\startup.lst --xref -o .\startup.o --depend .\startup.d)
+F (.\C_Uebung.c)(0x5A2955B1)(-c --cpu ARM7TDMI -g -O0 --apcs=interwork -I C:\Keil_ARM\ARM\RV31\INC-I C:\Keil_ARM\ARM\CMSIS\Include-I C:\Keil_ARM\ARM\Inc\Philips-o .\c_uebung.o --omf_browse .\c_uebung.crf --depend .\c_uebung.d)
+I (C:\Keil_ARM\ARM\Inc\Philips\LPC21xx.H)(0x532C4638)
