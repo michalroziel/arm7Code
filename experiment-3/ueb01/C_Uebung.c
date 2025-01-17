@@ -21,6 +21,7 @@
 /*                       *                                          */
 /********************************************************************/
 #include <LPC21xx.H>
+#include "C_Uebung.h"
 #define	PCLOCK 12500
 #define	BAUDRATE	4800
 
