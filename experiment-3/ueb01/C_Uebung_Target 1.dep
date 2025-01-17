@@ -1,4 +1,0 @@
-Dependencies for Project 'C_übung', Target 'Target 1': (DO NOT MODIFY !)
-F (.\Startup.s)(0x48D88A00)(--device DARMP -g --apcs=interwork -I "C:\Keil\ARM\INC\Philips" --list "Startup.lst" --xref -o "Startup.o")
-F (.\C_Übung.c)(0x4B20CF14)(-c --device DARMP -g -O0 --apcs=interwork -I "C:\Keil\ARM\INC\Philips" -o "c_Übung.o" --omf_browse "c_Übung.crf" --depend "c_Übung.d")
-I (C:\Keil\ARM\INC\Philips\LPC21xx.H)(0x48D88A82)
