@@ -27,40 +27,41 @@
 #include <LPC21xx.H>		/* LPC21xx Definitionen                 */
 #include "C_Uebung.H"
 
-#define	PCLOCK 12500
+#define	PCLOCK 12.5
 #define	BAUDRATE	4800
+
 
 /*
 int main(void) {
   unsigned int frequenzteiler = PCLOCK / (16 * BAUDRATE);
     while (1) {
 
-    }
-}
+t}
 */
+void initUart(void);
+
+void initUart(void) {
+    unsigned long Frequenzteiler = PCLOCK / (16 * BAUDRATE); // Calculate the frequency divider
+    U0DLL = Frequenzteiler % 256; // Low-byte (remainder of division by 256)
+    U0DLM = Frequenzteiler / 256; // High-byte (integer division by 256)
+	  U0LCR = 0x03; /* DLAB-Bit loeschen */
+    U0FCR = 0x07; /* FIFO's aktivieren und ruecksetzen */
+}
+
 int main(void){
   unsigned int data;
   /* Port-Pins konfigurieren */
     PINSEL0 = PINSEL0 | 0x50000;/* P0.8=TxD, P0.9=RxD UART1 */
-  /* serielle Schnittstelle konfigurieren */
-    U1LCR = 0x83; /* 8-Bit pro Datenbyte, 1 Stop-Bit,
-  keine Parität, DLAB-Bit setzen */
-
-  /* Divisor-Berechnung für 9600 Baud bei p-clock = 30Mhz
-  30*10^6 / (9600*16) = 195 */
-    U1DLL = 195; /* Baudrate setzen */
-    U1DLM = 0;
-    U1LCR = 0x03; /* DLAB-Bit loeschen */
-    U1FCR = 0x07; /* FIFO's aktivieren und ruecksetzen */
+		initUart();
 
 /* Hauptschleife */
 while (1) {
   /* test auf Datenempfang */
-    if ((U1LSR & 0x01) != 0) {
-      data = U1RBR; /* empfangene Daten auslesen */
+    if ((U0LSR & 0x01) != 0) {
+      data = U0RBR; /* empfangene Daten auslesen */
     /* versenden der Daten */
-      if ((U1LSR & 0x20) != 0) { /* Senderegister frei? */
-      U1THR = data; /* eintragen in sende-FIFO */
+      if ((U0LSR & 0x20) != 0) { /* Senderegister frei? */
+      U0THR = data; /* eintragen in sende-FIFO */
       }
     }
   }
