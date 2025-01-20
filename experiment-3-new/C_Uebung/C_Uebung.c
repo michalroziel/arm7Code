@@ -31,27 +31,33 @@
 #define	BAUDRATE	4800
 
 
-/*
-int main(void) {
-  unsigned int frequenzteiler = PCLOCK / (16 * BAUDRATE);
-    while (1) {
 
-t}
-*/
-void initUart(void);
+void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung);
 
-void initUart(void) {
-    unsigned long Frequenzteiler = PCLOCK / (16 * BAUDRATE); // Calculate the frequency divider
+void sendchar (unsigned char daten);
+
+void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung) {
+	  unsigned int komparameter = ((((((0b1000 +ParitätAuswahl)<<1)+ParitätAktivierung)<<1)+StoppBits)<<2)+DatenBits;
+	  PINSEL0 = PINSEL0 |0x05; /* 		UART0 Initialisierung 		*/
+    unsigned int Frequenzteiler = PCLOCK / (16 * BaudRate); // Calculate the frequency divider
+		U0LCR = komparameter;
     U0DLL = Frequenzteiler % 256; // Low-byte (remainder of division by 256)
     U0DLM = Frequenzteiler / 256; // High-byte (integer division by 256)
 	  U0LCR = 0x03; /* DLAB-Bit loeschen */
     U0FCR = 0x07; /* FIFO's aktivieren und ruecksetzen */
 }
 
+void sendchar (unsigned char daten){
+	while ((U0LSR & 0x20) == 0);
+	if ( (U0LSR & 0x20) != 0 ) {
+	   		U0THR = daten;
+	   }
+}
+
 int main(void){
   unsigned int data;
   /* Port-Pins konfigurieren */
-    PINSEL0 = PINSEL0 |0x05; /* 		UART0 Initialisierung 		*/
+   
 		initUart();
 
 /* Hauptschleife */

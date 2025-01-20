@@ -10,11 +10,23 @@ Project File Date:  01/19/2025
 Rebuild target 'Simulator'
 assembling Startup.s...
 compiling C_Uebung.c...
-linking...
-Program Size: Code=812 RO-data=16 RW-data=0 ZI-data=1256  
-".\C_Uebung.axf" - 0 Error(s), 0 Warning(s).
+C_Uebung.c(35): error:  #7: unrecognized token
+  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int Parität);
+C_Uebung.c(35): error:  #18: expected a ")"
+  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int Parität);
+C_Uebung.c(39): error:  #7: unrecognized token
+  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int Parität) {
+C_Uebung.c(39): error:  #18: expected a ")"
+  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int Parität) {
+C_Uebung.c(40): error:  #65: expected a ";"
+          unsigned int komparameter = 0b10;
+C_Uebung.c(40): warning:  #177-D: variable "komparameter" was declared but never referenced
+          unsigned int komparameter = 0b10;
+C_Uebung.c(60): error:  #165: too few arguments in function call
+                initUart();
+C_Uebung.c: 1 warning, 6 errors
+".\C_Uebung.axf" - 6 Error(s), 1 Warning(s).
+Target not created
 </pre>
 </body>
 </html>
-12 RO-data=16 RW-data=0 ZI-data=1256  
-".\C_Uebung.axf" - 0 Error(s), 1 Warning(s).
