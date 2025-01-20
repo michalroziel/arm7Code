@@ -2,7 +2,7 @@
 #include "C_Uebung.H"
 
 #define	PCLOCK 12.5
-#define	BAUDRATE	4800
+#define	BAUDRATE	19200
 
 void initUart(unsigned int BaudRate, unsigned int DatenBits, unsigned int StoppBits, unsigned int ParitätAuswahl, unsigned int ParitätAktivierung);
 void sendchar(unsigned char daten);
@@ -11,7 +11,15 @@ void readHexInput(char* buffer, int maxLength);
 void sendHexDump(unsigned int address);
 
 void initUart(unsigned int BaudRate, unsigned int DatenBits, unsigned int StoppBits, unsigned int ParitätAuswahl, unsigned int ParitätAktivierung) {
-    unsigned int komparameter = ((((((0b1000 + ParitätAuswahl) << 1) + ParitätAktivierung) << 1) + StoppBits) << 2) + DatenBits;
+  //  unsigned int komparameter = ((((((0b1000 + ParitätAuswahl) << 1) + ParitätAktivierung) << 1) + StoppBits) << 2) + DatenBits;
+
+    unsigned int komparameter = (0b1000 + ParitätAuswahl);
+      komparameter = (komparameter << 1) + ParitätAktivierung;
+      komparameter = (komparameter << 1) + StoppBits;
+      komparameter = (komparameter << 2) + DatenBits;
+
+
+
     PINSEL0 = PINSEL0 | 0x50000; /* P0.8=TxD, P0.9=RxD UART1 */
     unsigned int Frequenzteiler = PCLOCK / (16 * BaudRate); // Calculate the frequency divider
     U1LCR = komparameter;
@@ -35,11 +43,11 @@ void sendchars(char* daten) {
 }
 
 // Liest eine Hexadezimalzahl von der seriellen Schnittstelle
-void readHexInput(char* buffer, int maxLength) {
+void readHexInput(char* buffer) {
     int index = 0;
     char receivedChar;
 
-    while (index < maxLength - 1) {
+    while (index < 9 ) {                            // 9 da : 8 bytes und abschluss zeichen
         // Warte auf ein empfangenes Zeichen
         while ((U1LSR & 0x01) == 0);
         receivedChar = U1RBR;
@@ -54,12 +62,12 @@ void readHexInput(char* buffer, int maxLength) {
             (receivedChar >= 'A' && receivedChar <= 'F') ||
             (receivedChar >= 'a' && receivedChar <= 'f')) {
             buffer[index++] = receivedChar;
-            sendchar(receivedChar); // Eingegebenes Zeichen zurücksenden (Echo)
+            
         }
     }
 
     buffer[index] = '\0'; // Nullterminierung hinzufügen
-    sendchars("\r\n");    // CR + LF nach Eingabe
+    
 }
 
 
@@ -78,7 +86,7 @@ void sendint(int daten){
 }
 // Sendet einen Hex-Dump von 16 Bytes ab der angegebenen Adresse
 void sendHexDump(unsigned int address) {
-  sendchars("\r\n0x");
+  sendchars("\r\n");
   char buffer[16];
 
 
@@ -86,23 +94,43 @@ void sendHexDump(unsigned int address) {
 
     for (int i = 0; i < 16; i++) {
         buffer[i] = ptr[i];  // Lese die Daten ab der Adresse
+
+      if ( i == 15){
+
+        buffer[i+1] = '\n';
+
+      }
+
+
     }
+
+
 
     sendchars(buffer);
     // Zeilenumbruch hinzufügen
     sendchars("\r\n\r\n");
 }
 
+void sendAsciiNumbers(void) {
+    for (char num = '0'; num <= '9'; num++) {
+        sendchar(num);  // Sende die ASCII-Zahl über UART
+    }
+    //sendchars("\r\n");  // Neue Zeile zur Trennung
+}
+
 int main(void) {
     char inputBuffer[9]; // Buffer für die Eingabe (maximal 8 Hex-Zeichen + Nullterminierung)
-    unsigned int address;
+    unsigned long address;
 
     // UART initialisieren
-    initUart(BAUDRATE, 8, 1, 0, 0);
+    initUart(BAUDRATE, 3, 1, 1, 1);
 
-    sendchars("Hex-Dump Tool bereit. Geben Sie eine 8-stellige Hex-Zahl ein (Abschluss mit CR):\r\n");
+    sendAsciiNumbers();
 
     while (1) {
+
+
+
         // Hexadezimalzahl von der seriellen Schnittstelle lesen
         readHexInput(inputBuffer, sizeof(inputBuffer));
 
