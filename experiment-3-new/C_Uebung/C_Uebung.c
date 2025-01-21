@@ -10,121 +10,139 @@
 /*    Entwicklungsprogramm uVision fuer ARM-Mikrocontroller         */
 /*                                                                  */
 /********************************************************************/
-/*  Aufgaben-Nr.:        *                                          */
-/*                       *                                          */
-/********************************************************************/
-/*                       *                                          */
-/********************************************************************/
 /*  Name / Matrikel-Nr.: *      Valentin Straßer                    */
 /*                       *      Michal Roziel                       */
-/*                       *                                          */
 /********************************************************************/
 /*  Abgabedatum:         *      16.01.2025                          */
-/*                       *                                          */
 /********************************************************************/
 
-#include <LPC21xx.H>        /* LPC21xx Definitionen                 */
+#include <LPC21xx.H>  // LPC21xx Mikrocontroller Definitionen
 
-#define PCLOCK 12500000
-#define BAUDRATE 19200
+// UART-Konstanten
+#define PCLOCK 12500000   // Peripherie-Clock in Hz
+#define BAUDRATE 19200    // Baudrate der seriellen Schnittstelle
 
-void initUart(unsigned int BaudRate, unsigned int DatenBits, unsigned int StoppBits, unsigned int ParitaetAuswahl, unsigned int ParitaetAktivierung);
-void sendchar(char daten);
-void sendchars(char* daten);
-unsigned long readHexInput(void);
-char readChar(void);
-void sendHexFromMemory(unsigned long address, int length) ;
+// Funktionsprototypen
+void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable);
+void uartSendChar(char data);
+void uartSendString(char* str);
+char uartReadChar(void);
+void uartReadHexInput(char* inputBuffer, unsigned long* address);
+void memoryDumpHex(unsigned long address, int length);
 
+void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable) {
+    unsigned int uartConfig = 0;
+    unsigned int divisor;
 
+    // Konfiguration des UART-Modus
+    uartConfig = (8 + paritySelect);  // Parität
+    uartConfig = (uartConfig << 1) + parityEnable;  
+    uartConfig = (uartConfig << 1) + stopBits;  
+    uartConfig = (uartConfig << 2) + dataBits;  
 
-void initUart(unsigned int BaudRate, unsigned int DatenBits, unsigned int StoppBits, unsigned int ParitaetAuswahl, unsigned int ParitaetAktivierung) {
-    unsigned int komparameter;
-    unsigned int Frequenzteiler;
+    PINSEL0 |= 0x50000;  // P0.8 = TxD1, P0.9 = RxD1 für UART1 aktivieren
 
-    komparameter = (8 + ParitaetAuswahl);
-    komparameter = (komparameter << 1) + ParitaetAktivierung;
-    komparameter = (komparameter << 1) + StoppBits;
-    komparameter = (komparameter << 2) + DatenBits;
-
-    PINSEL0 |= 0x50000; // P0.8=TxD, P0.9=RxD UART1
-    Frequenzteiler = PCLOCK / (16 * BaudRate);
-    U1LCR = 0x9F;
-    U1DLL = Frequenzteiler % 256;
-    U1DLM = Frequenzteiler / 256;
-    U1LCR = 0x1F;
-    U1FCR = 0x07;
+    divisor = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
+    U1LCR = 0x9F;  // DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
+    U1DLL = divisor % 256;  // Niedriges Byte des Divisors
+    U1DLM = divisor / 256;   // Hohes Byte des Divisors
+    U1LCR = 0x1F;  // DLAB-Bit löschen, 8 Datenbits, 1 Stoppbit
+    U1FCR = 0x07;  // FIFO aktivieren und zurücksetzen
 }
 
-void sendchar(char daten) {
-    while ((U1LSR & 0x20) == 0);
-    U1THR = daten;
+// Zeichen über UART senden
+void uartSendChar(char data) {
+    while ((U1LSR & 0x20) == 0);  // Warte, bis das Transmit-Register bereit ist
+    U1THR = data;  // Zeichen senden
 }
 
-void sendchars(char* daten) {
-    int j = 0;
-    while (daten[j] != '\0') {
-        sendchar(daten[j]);
-        j++;
+// String über UART senden
+void uartSendString(char* str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        uartSendChar(str[i]);  // Zeichenweise senden
+        i++;
     }
-	}
-char readChar(void){
-	while (!(U1LSR & 0x01));
-        return U1RBR;
 }
 
-void sendHexFromMemory(unsigned long address, int length) {
-    // Zeiger auf die Adresse casten
-    char* ptr = (char*) address;
-		int i;
-    for (i = 0; i < length; i++) {
-        unsigned char value = ptr[i];  // Lese ein Byte aus dem Speicher
+// Zeichen über UART empfangen
+char uartReadChar(void) {
+    while (!(U1LSR & 0x01));  // Warte auf empfangenes Zeichen
+    return U1RBR;  // Zeichen zurückgeben
+}
 
-        // Oberes und unteres Nibble des Byte-Wertes in Hexadezimal umwandeln
+// Hexadezimale Adresse von Benutzer lesen
+void uartReadHexInput(char* inputBuffer, unsigned long* address) {
+    char receivedChar;
+    int i;
+    *address = 0;  // Adresse initialisieren
+
+    for (i = 0; i < 8; i++) {
+        receivedChar = uartReadChar();  // Zeichen empfangen
+        uartSendChar(receivedChar);  // Echo des Zeichens
+
+        if (receivedChar == '\r') {  // Eingabe beenden
+            inputBuffer[i] = '\0';
+            break;
+        }
+
+        inputBuffer[i] = receivedChar;  // Zeichen im Puffer speichern
+
+        // Zeichen in Hex umwandeln
+        if (receivedChar >= '0' && receivedChar <= '9') {
+            *address = (*address << 4) + (receivedChar - '0');
+        } 
+        else if (receivedChar >= 'A' && receivedChar <= 'F') {
+            *address = (*address << 4) + (receivedChar - 'A' + 10);
+        } 
+        else if (receivedChar >= 'a' && receivedChar <= 'f') {
+            *address = (*address << 4) + (receivedChar - 'a' + 10);
+        } 
+        else {
+            uartSendString("Ungueltiges Zeichen!\r\n");
+            i--;  // Wiederhole diese Stelle
+        }
+    }
+
+    inputBuffer[i] = '\0';  // Nullterminierung für String
+}
+
+// Speicherinhalt als Hexadezimalwerte ausgeben
+void memoryDumpHex(unsigned long address, int length) {
+    char* ptr = (char*) address;  // Speicheradresse casten
+    int i;
+
+    for (i = 0; i < length; i++) {
+        unsigned char value = ptr[i];  // Byte auslesen
+
+        // High- und Low-Nibble extrahieren
         char highNibble = (value >> 4) & 0x0F;
         char lowNibble = value & 0x0F;
 
-        // Nibble in Hex-Zeichen umwandeln und senden
-        sendchar(highNibble < 10 ? '0' + highNibble : 'A' + (highNibble - 10));
-        sendchar(lowNibble < 10 ? '0' + lowNibble : 'A' + (lowNibble - 10));
+        // In Hex umwandeln und senden
+        uartSendChar(highNibble < 10 ? '0' + highNibble : 'A' + (highNibble - 10));
+        uartSendChar(lowNibble < 10 ? '0' + lowNibble : 'A' + (lowNibble - 10));
 
-        sendchars(" ");  // Leerzeichen für bessere Lesbarkeit
+        uartSendChar(' ');  // Leerzeichen für bessere Lesbarkeit
     }
-}
-
-unsigned long readHexInput(void) {
-    char receivedChar;
-		unsigned long address = 0;
-		int i;
-	  for (i = 0; i < 8; i++) {
-        receivedChar = readChar();
-			  sendchar(receivedChar);
-				if (receivedChar == '\r') {
-            break;
-        }
-				if (receivedChar >= '0' && receivedChar <= '9') {
-            address = (address << 4) + (receivedChar - '0');
-        } 
-        else if (receivedChar >= 'A' && receivedChar <= 'F') {
-            address = (address << 4) + (receivedChar - 'A' + 10);
-        } 
-        else if (receivedChar >= 'a' && receivedChar <= 'f') {
-            address = (address << 4) + (receivedChar - 'a' + 10);
-        } else {
-            sendchars("Ungueltiges Zeichen!\r\n");
-            i--;
-        }
-    }
-		return address;
+    uartSendString("\r\n");
 }
 
 int main(void) {
-    unsigned long address = 0;
-    initUart(BAUDRATE, 3, 1, 1, 1);
+    char inputBuffer[9];  // Platz für die eingegebene Adresse (8 Zeichen + Nullterminierung)
+    unsigned long address;
+
+    uartInit(BAUDRATE, 3, 1, 1, 1);  // UART initialisieren
+
     while (1) {
-			address = readHexInput();
-			sendchars("\r\n");
-			sendchars("Addresse: ");
-			sendHexFromMemory(address,16);
-			sendchars("\r\n\n");  // Neue Zeile am Ende
-    }	
+        uartReadHexInput(inputBuffer, &address);
+        uartSendString("\r\n");
+
+        uartSendString(inputBuffer);  // Original-Eingabe anzeigen
+			  uartSendString(": ");
+
+        memoryDumpHex(address, 16);  // Speicherinhalt anzeigen
+
+        uartSendString("\r\n\n");
+    }
 }
