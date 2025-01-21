@@ -33,7 +33,6 @@ void sendchar(char daten);
 void sendchars(char* daten);
 unsigned long readHexInput(void);
 char readChar(void);
-void sendlong(unsigned long number);
 void sendHexFromMemory(unsigned long address, int length) ;
 
 
@@ -72,22 +71,6 @@ char readChar(void){
 	while (!(U1LSR & 0x01));
         return U1RBR;
 }
-
-void sendlong(unsigned long number) {
-    char buffer[20];  // Platz für maximal 20 Ziffern (ein long kann bis zu 19 Stellen haben)
-    int index = 0;
-
-    // Extrahiere Ziffern von hinten nach vorne
-    do {
-        buffer[index++] = (number % 10) + '0';  // Letzte Ziffer extrahieren und als ASCII-Zeichen speichern
-        number /= 10;  // Entferne die letzte Ziffer
-    } while (number > 0);
-
-    // Ziffern in der richtigen Reihenfolge senden
-    while (index > 0) {
-        sendchar(buffer[--index]);  // Puffer rückwärts durchlaufen und Zeichen senden
-    }
-	}
 
 void sendHexFromMemory(unsigned long address, int length) {
     // Zeiger auf die Adresse casten
@@ -134,17 +117,11 @@ unsigned long readHexInput(void) {
 		return address;
 }
 
-
-
 int main(void) {
     unsigned long address = 0;
     initUart(BAUDRATE, 3, 1, 1, 1);
     while (1) {
 			address = readHexInput();
-			sendchar('\n');
-			sendchars("Deine Addresse lautet: ");
-			sendlong(address);
-			sendchar('\n');
 			sendchars("\r\n");
 			sendchars("Addresse: ");
 			sendHexFromMemory(address,16);
