@@ -57,6 +57,32 @@ void sendchar(unsigned char daten) {
     U1THR = daten;
 }
 
+void sendHexFromMemory(unsigned long address, int length) {
+    sendchars("Hex-Dump:\r\n");
+
+    // Zeiger auf die Adresse casten
+    unsigned char* ptr = (unsigned char*)address;
+
+    for (int i = 0; i < length; i++) {
+        unsigned char value = ptr[i];  // Lese ein Byte aus dem Speicher
+
+        // Oberes und unteres Nibble des Byte-Wertes in Hexadezimal umwandeln
+        char highNibble = (value >> 4) & 0x0F;
+        char lowNibble = value & 0x0F;
+
+        // Nibble in Hex-Zeichen umwandeln und senden
+        sendchar(highNibble < 10 ? '0' + highNibble : 'A' + (highNibble - 10));
+        sendchar(lowNibble < 10 ? '0' + lowNibble : 'A' + (lowNibble - 10));
+
+        sendchars(" ");  // Leerzeichen für bessere Lesbarkeit
+    }
+
+    sendchars("\r\n");  // Neue Zeile am Ende
+}
+
+
+
+
 void sendlong(unsigned long number) {
     char buffer[20];  // Platz für maximal 20 Ziffern (ein long kann bis zu 19 Stellen haben)
     int index = 0;
