@@ -1,7 +1,7 @@
 #include <LPC21xx.H>
 
-#define PCLOCK 12500000
-#define BAUDRATE 19200
+#define PCLOCK 12500000 // 12.6 MHz
+#define BAUDRATE 19200  
 
 void initUart(unsigned int BaudRate, unsigned int DatenBits, unsigned int StoppBits, unsigned int ParitaetAuswahl, unsigned int ParitaetAktivierung);
 void sendchar(unsigned char daten);
@@ -63,27 +63,49 @@ void sendchars(char* daten) {
     }
 }
 
-void readHexInput(char* buffer) {
+unsigned long  readHexInput(void) {
     int index = 0;
     char receivedChar;
 
-    while (index < 8) {
-        while ((U1LSR & 0x01) == 0);
-        receivedChar = U1RBR;
+    unsigned long address = 0 ;
+
+    sendchars("readHexInput wurde aufgerufen");
+
+while (index < 8) {
+        receivedChar = readChar();  // Verwende readChar() zum Empfang eines Zeichens
 
         if (receivedChar == '\r') {
             break;
         }
 
-        if ((receivedChar >= '0' && receivedChar <= '9') ||
-            (receivedChar >= 'A' && receivedChar <= 'F') ||
-            (receivedChar >= 'a' && receivedChar <= 'f')) {
-            buffer[index++] = receivedChar;
+        if (receivedChar >= '0' && receivedChar <= '9') {
+            address = (address << 4) + (receivedChar - '0');
+        } 
+        else if (receivedChar >= 'A' && receivedChar <= 'F') {
+            address = (address << 4) + (receivedChar - 'A' + 10);
+        } 
+        else if (receivedChar >= 'a' && receivedChar <= 'f') {
+            address = (address << 4) + (receivedChar - 'a' + 10);
+        } 
+        else {
+            sendchars("Ungültiges Zeichen!\r\n");
+            continue;  // Ungültige Zeichen überspringen
         }
+
+        index++;
+        sendchar(receivedChar);  // Echo des eingegebenen Zeichens
     }
 
-    buffer[index] = '\0';
+      return address;
 }
+
+
+char readChar(void) {
+    while (!(U1LSR & 0x01));  // Wait until data is available in the receiver buffer
+    return U1RBR;             // Read and return the received character
+}
+
+
 
 void sendHexDump(unsigned int address) {
     char buffer[16];
