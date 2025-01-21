@@ -3,11 +3,11 @@
 <title>Static Call Graph - [.\C_Uebung.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\C_Uebung.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Tue Jan 21 12:31:15 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Wed Jan 22 00:54:57 2025
 <BR><P>
-<H3>Maximum Stack Usage =         52 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =         56 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-main &rArr; sendHexDump &rArr; sendchars
+main &rArr; uartInit
 <P>
 <H3>
 Functions with no stack information
@@ -174,51 +174,62 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__user_setup_stackheap
 </UL>
 
-<P><STRONG><a name="[20]"></a>hexToDecimal</STRONG> (ARM, 124 bytes, Stack size 0 bytes, c_uebung.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-</UL>
-
-<P><STRONG><a name="[1a]"></a>initUart</STRONG> (ARM, 124 bytes, Stack size 32 bytes, c_uebung.o(.text))
+<P><STRONG><a name="[1a]"></a>uartInit</STRONG> (ARM, 128 bytes, Stack size 32 bytes, c_uebung.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32 + Unknown Stack Size
-<LI>Call Chain = initUart
+<LI>Call Chain = uartInit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1d]"></a>sendchar</STRONG> (ARM, 32 bytes, Stack size 0 bytes, c_uebung.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendchars
+<P><STRONG><a name="[1d]"></a>uartSendChar</STRONG> (ARM, 32 bytes, Stack size 0 bytes, c_uebung.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;memoryDumpHex
+<LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartReadHexInput
+<LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendString
 </UL>
 
-<P><STRONG><a name="[1c]"></a>sendchars</STRONG> (ARM, 48 bytes, Stack size 4 bytes, c_uebung.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = sendchars
+<P><STRONG><a name="[1c]"></a>uartSendString</STRONG> (ARM, 48 bytes, Stack size 4 bytes, c_uebung.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = uartSendString
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendchar
+<BR>[Calls]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendChar
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendHexDump
-</UL>
-
-<P><STRONG><a name="[1f]"></a>readHexInput</STRONG> (ARM, 136 bytes, Stack size 0 bytes, c_uebung.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;memoryDumpHex
+<LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartReadHexInput
 </UL>
 
-<P><STRONG><a name="[1e]"></a>sendHexDump</STRONG> (ARM, 64 bytes, Stack size 32 bytes, c_uebung.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = sendHexDump &rArr; sendchars
+<P><STRONG><a name="[1f]"></a>uartReadChar</STRONG> (ARM, 32 bytes, Stack size 0 bytes, c_uebung.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartReadHexInput
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendchars
+
+<P><STRONG><a name="[1e]"></a>uartReadHexInput</STRONG> (ARM, 220 bytes, Stack size 20 bytes, c_uebung.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = uartReadHexInput &rArr; uartSendString
+</UL>
+<BR>[Calls]<UL><LI><a href="#[1f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartReadChar
+<LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendString
+<LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendChar
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b]"></a>main</STRONG> (ARM, 68 bytes, Stack size 16 bytes, c_uebung.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52 + Unknown Stack Size
-<LI>Call Chain = main &rArr; sendHexDump &rArr; sendchars
+<P><STRONG><a name="[20]"></a>memoryDumpHex</STRONG> (ARM, 132 bytes, Stack size 24 bytes, c_uebung.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = memoryDumpHex &rArr; uartSendString
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendHexDump
-<LI><a href="#[1f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;readHexInput
-<LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initUart
-<LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hexToDecimal
+<BR>[Calls]<UL><LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendString
+<LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendChar
+</UL>
+<BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[b]"></a>main</STRONG> (ARM, 112 bytes, Stack size 24 bytes, c_uebung.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56 + Unknown Stack Size
+<LI>Call Chain = main &rArr; uartInit
+</UL>
+<BR>[Calls]<UL><LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;memoryDumpHex
+<LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartReadHexInput
+<LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartSendString
+<LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartInit
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> rtentry2.o(.ARM.Collect$$rtentry$$0000000D)
 </UL>
@@ -273,7 +284,7 @@ Global Symbols
 <LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__arm_div5
 <LI><a href="#[27]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__arm_div8
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initUart
+<BR>[Called By]<UL><LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uartInit
 </UL>
 
 <P><STRONG><a name="[53]"></a>__semihosting_library_function</STRONG> (ARM, 0 bytes, Stack size 0 bytes, indicate_semi.o(.text), UNUSED)

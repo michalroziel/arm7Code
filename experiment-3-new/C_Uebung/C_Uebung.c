@@ -43,7 +43,7 @@ void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBit
     PINSEL0 |= 0x50000;  // P0.8 = TxD1, P0.9 = RxD1 für UART1 aktivieren
 
     divisor = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
-    U1LCR = 0x9F;  // DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
+    U1LCR = uartConfig;  // DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
     U1DLL = divisor % 256;  // Niedriges Byte des Divisors
     U1DLM = divisor / 256;   // Hohes Byte des Divisors
     U1LCR = 0x1F;  // DLAB-Bit löschen, 8 Datenbits, 1 Stoppbit
@@ -131,9 +131,14 @@ void memoryDumpHex(unsigned long address, int length) {
 int main(void) {
     char inputBuffer[9];  // Platz für die eingegebene Adresse (8 Zeichen + Nullterminierung)
     unsigned long address;
-
+	
+		
+	
     uartInit(BAUDRATE, 3, 1, 1, 1);  // UART initialisieren
-
+	
+	  uartSendString("0123456789");
+	  uartSendString("\r\n");
+		
     while (1) {
         uartReadHexInput(inputBuffer, &address);
         uartSendString("\r\n");

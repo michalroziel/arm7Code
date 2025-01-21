@@ -28,7 +28,8 @@
 #include "C_Uebung.H"
 
 #define			PCLOCK 12.5
-#define 		SWITCH_MASK12      0x30000                // Schalter an P0.16 und P0.17
+#define 		SWITCH_MASK1      0x10000                // Schalter an P0.16 und P0.17
+#define 		SWITCH_MASK2      0x20000
 #define			SWITCH_MASK3				0x1000000
 #define 		INPUT_MASK       0x3C00     		        // Eingabemaske für BCD
 static const unsigned int baudrates[] = {
@@ -49,8 +50,34 @@ void initUart(void);
 unsigned initBaudrate(void);
 
 void initBCD(void);
+void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable);
+void uartSendString(char* str);
+void uartSendChar(char data);
+unsigned int readSwitchState1(void);
+unsigned int readSwitchState2(void);
+unsigned int readSwitchState3(void);
+void sendMenue(void);
+char uartReadChar(void);
 
+void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable) {
+    unsigned int uartConfig = 0;
+    unsigned int divisor;
 
+    // Konfiguration des UART-Modus
+    uartConfig = (8 + paritySelect);  // Parität
+    uartConfig = (uartConfig << 1) + parityEnable;  
+    uartConfig = (uartConfig << 1) + stopBits;  
+    uartConfig = (uartConfig << 2) + dataBits;  
+
+    PINSEL0 = PINSEL0 |0x05;  // P0.8 = TxD1, P0.9 = RxD1 für UART1 aktivieren
+
+    divisor = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
+    U0LCR = uartConfig;  // DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
+    U0DLL = divisor % 256;  // Niedriges Byte des Divisors
+    U0DLM = divisor / 256;   // Hohes Byte des Divisors
+    U0LCR = 0x1F;  // DLAB-Bit löschen, 8 Datenbits, 1 Stoppbit
+    U0FCR = 0x07;  // FIFO aktivieren und zurücksetzen
+}
 
 // Eingabewert von Schaltern einlesen
 unsigned int readInputBCD(void) {
@@ -64,35 +91,70 @@ unsigned int initBaudrate(void){
 	
 }
 
-// Schalter-Status einlesen
-unsigned int readSwitchState(void) {
-    return (IOPIN0 & SWITCH_MASK12) >> 16;  // Bits 16-17 ausmaskieren
+// Zeichen über UART senden
+void uartSendChar(char data) {
+    while ((U0LSR & 0x20) == 0);  // Warte, bis das Transmit-Register bereit ist
+    U0THR = data;  // Zeichen senden
 }
 
-void initUart(void) {
-    unsigned long Frequenzteiler = PCLOCK / (16 * initBaudrate()); // Calculate the frequency divider
-    U0DLL = Frequenzteiler % 256; // Low-byte (remainder of division by 256)
-    U0DLM = Frequenzteiler / 256; // High-byte (integer division by 256)
-	  U0LCR = 0x03; /* DLAB-Bit loeschen */
-    U0FCR = 0x07; /* FIFO's aktivieren und ruecksetzen */
+// String über UART senden
+void uartSendString(char* str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        uartSendChar(str[i]);  // Zeichenweise senden
+        i++;
+    }
+}
+
+unsigned int readSwitchState1(void){
+	return (IOPIN0 & SWITCH_MASK1) >> 16;
+}
+
+unsigned int readSwitchState2(void){
+	return (IOPIN0 & SWITCH_MASK2) >> 17;
+}
+
+unsigned int readSwitchState3(void){
+	return (IOPIN1 & SWITCH_MASK3) >> 25;
+}
+void sendMenue(){
+	/* Start-Menue Senden */
+	char newline[] = {0x0D, 0x0A};
+	uartSendString(newline);
+	uartSendString("Stopp-Uhr");
+	uartSendString(newline);
+	uartSendString("       Start und Anhalten durch Druecken der Interrupt-Taste");
+	uartSendString(newline);
+	uartSendString("       s,S - Start und Anhalten");
+	uartSendString(newline);
+	uartSendString("       a,A - Anzeigen des Standes");
+	uartSendString(newline);
+	uartSendString("       r,R - Ruecksetzen der Stoppuhr");
+	uartSendString(newline);
+}
+char uartReadChar(void) {
+    while (!(U0LSR & 0x01));  // Warte auf empfangenes Zeichen
+    return U0RBR;  // Zeichen zurückgeben
 }
 
 int main(void){
-  unsigned int data;
-  /* Port-Pins konfigurieren */
-    PINSEL0 = PINSEL0 |0x05; /* 		UART0 Initialisierung 		*/
-		initUart();
-	  initBaudrate();
+   char choice;
+   uartInit(initBaudrate(),3,readSwitchState3(),readSwitchState2(),readSwitchState1());
+		
 
 /* Hauptschleife */
 while (1) {
-  /* test auf Datenempfang */
-    if ((U0LSR & 0x01) != 0) {
-      data = U0RBR; /* empfangene Daten auslesen */
-    /* versenden der Daten */
-      if ((U0LSR & 0x20) != 0) { /* Senderegister frei? */
-      U0THR = data; /* eintragen in sende-FIFO */
+   sendMenue();
+	 choice = uartReadChar();
+		if(choice == 's' || choice == 'S'){
+			uartSendString("Timer wurde an aus");
+		} else if (choice == 'a' || choice == 'A'){
+			uartSendString("Timerstand wurde angezeigt");
+		} else if (choice == 'r' || choice == 'R'){
+			uartSendString("Timerstand wurde zurück gesetzt");
+		} else {
+       uartSendString("Falsche Eingabe!");
+          
       }
-    }
   }
 }
