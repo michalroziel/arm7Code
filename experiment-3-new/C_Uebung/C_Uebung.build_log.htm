@@ -10,35 +10,28 @@ Project File Date:  01/19/2025
 Rebuild target 'Simulator'
 assembling Startup.s...
 compiling C_Uebung.c...
-C_Uebung.c(35): error:  #7: unrecognized token
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung);
-C_Uebung.c(35): error:  #18: expected a ")"
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung);
-C_Uebung.c(35): error:  #7: unrecognized token
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung);
-C_Uebung.c(39): error:  #7: unrecognized token
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung) {
-C_Uebung.c(39): error:  #18: expected a ")"
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung) {
-C_Uebung.c(39): error:  #7: unrecognized token
-  void initUart(unsigned int BaudRate, unsigned int DatenBits,unsigned int StoppBits,unsigned int ParitätAuswahl,unsigned int ParitätAktivierung) {
-C_Uebung.c(40): error:  #18: expected a ")"
-          unsigned int komparameter = ((((((0b1000 +ParitätAuswahl)<<1)+ParitätAktivierung)<<1)+StoppBits)<<2)+DatenBits;
-C_Uebung.c(40): error:  #7: unrecognized token
-          unsigned int komparameter = ((((((0b1000 +ParitätAuswahl)<<1)+ParitätAktivierung)<<1)+StoppBits)<<2)+DatenBits;
-C_Uebung.c(40): error:  #7: unrecognized token
-          unsigned int komparameter = ((((((0b1000 +ParitätAuswahl)<<1)+ParitätAktivierung)<<1)+StoppBits)<<2)+DatenBits;
-C_Uebung.c(40): error:  #18: expected a ")"
-          unsigned int komparameter = ((((((0b1000 +ParitätAuswahl)<<1)+ParitätAktivierung)<<1)+StoppBits)<<2)+DatenBits;
-C_Uebung.c(42): error:  #268: declaration may not appear after executable statement in block
-      unsigned int Frequenzteiler = PCLOCK / (16 * BaudRate); // Calculate the frequency divider
-C_Uebung.c(58): warning:  #223-D: function "strlen" declared implicitly
-        int laenge = strlen(daten);
-C_Uebung.c(73): error:  #165: too few arguments in function call
-                initUart();
-C_Uebung.c: 1 warning, 12 errors
-".\C_Uebung.axf" - 12 Error(s), 1 Warning(s).
+linking...
+Program Size: Code=1720 RO-data=16 RW-data=0 ZI-data=1256  
+".\C_Uebung.axf" - 0 Error(s), 0 Warning(s).
+
+C_Uebung.c(103): warning:  #177-D: variable "address" was declared but never referenced
+      unsigned long address;
+C_Uebung.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=1760 RO-data=16 RW-data=0 ZI-data=1256  
+".\C_Uebung.axf" - 0 Error(s), 2 Warning(s).
+               sendchar('/n'):
+C_Uebung.c(109): error:  #65: expected a ";"
+                        sendchar('/n'):
+C_Uebung.c(102): warning:  #177-D: variable "inputBuffer" was declared but never referenced
+      char inputBuffer[9];
+C_Uebung.c(103): warning:  #177-D: variable "address" was declared but never referenced
+      unsigned long address;
+C_Uebung.c: 4 warnings, 2 errors
+".\C_Uebung.axf" - 2 Error(s), 4 Warning(s).
 Target not created
-</pre>
-</body>
-</html>
+ng.c(26): warning:  #1-D: last line of file ends without a newline
+  } /* Ende von main */
+C_Uebung.c: 1 warning, 8 errors
+".\C_Uebung.axf" - 8 Error(s), 1 Warning(s).
+Target not created
