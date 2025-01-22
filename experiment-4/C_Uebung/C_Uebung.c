@@ -49,6 +49,8 @@ void initUart(void);
 
 unsigned initBaudrate(void);
 
+void myEXTINT(void) __irq;
+void T0isr(void) __irq;
 void initBCD(void);
 void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable);
 void uartSendString(char* str);
@@ -137,11 +139,113 @@ char uartReadChar(void) {
     return U0RBR;  // Zeichen zurückgeben
 }
 
+void sendint(int daten) {
+    char data[5];  // Ein Integer hat maximal 5 Ziffern (bei einer Zahl im Bereich 0-9999).
+    int i = 0;
+    int j;
+    // Fall 1: daten ist 0
+    if (daten == 0) {
+        data[i++] = '0';  // Wenn die Zahl 0 ist, setzen wir das erste Zeichen als '0'
+    }
+    // Fall 2: daten ist eine andere Zahl
+    else {
+        while (daten > 0) {
+            data[i++] = (daten % 10) + '0';  // Nimm die letzte Ziffer und speichere sie als Zeichen
+            daten /= 10;  // Entferne die letzte Ziffer
+        }
+    }
+    // Umkehren der Ziffern (die Zahl ist nun rückwärts gespeichert)
+    for (j = i - 1; j >= 0; j--) {
+        // Warten, bis der UART bereit ist, Daten zu senden
+        while ((U0LSR & 0x20) == 0);  // Warteschleife bis der UART bereit ist
+        // Sende das Zeichen
+        U0THR = data[j];
+    }
+}
+
+void sendTime(int time) { // zur unwandlung für später
+    int tempIA[3] = {0, 0, 0};
+
+    if (time < 60) {  // < 60 Sekunden
+        tempIA[2] = time;  // Sekunden
+    } else if (time < 3600) {  // >= 60 Sekunden und < 3600 Sekunden (1 Stunde)
+        tempIA[1] = time / 60;  // Minuten
+        tempIA[2] = time % 60;  // Sekunden
+    } else {  // >= 3600 Sekunden (1 Stunde oder mehr)
+        tempIA[0] = time / 3600;  // Stunden
+        tempIA[1] = (time % 3600) / 60;  // Minuten
+        tempIA[2] = time % 60;  // Sekunden
+    }
+	uartSendString("Aktueller Stand: ");
+	if (tempIA[0] < 10) uartSendChar('0');
+	sendint(tempIA[0]);
+	uartSendChar(':');
+	if (tempIA[1] < 10) uartSendChar('0');
+	sendint(tempIA[1]);
+	uartSendChar(':');
+	if (tempIA[2] < 10) uartSendChar('0');
+	sendint(tempIA[2]);
+	uartSendString("\r\n");
+}
+
+void myEXTINT(void) __irq{
+	int i;
+	static unsigned int tasterzustand = 0;
+	if(tasterzustand > 0)
+	{
+	    if (T0TCR==0x01){									// Wenn Timer läuft
+			T0TCR=0x00;										// Timer anhalten
+			uartSendString ("Timer angehalten!");
+			uartSendString("\r\n");
+		} else {											// sonst
+			T0TCR=0x01;										// Timer starten
+			uartSendString ("Timer gestartet!");
+			uartSendString("\r\n");
+		}
+		tasterzustand = 0;
+	
+		for(i=0; i<200000;i++);
+		EXTINT=0x04;										// EINT2 flankenabhängig
+	}
+	else
+	{
+		tasterzustand += 1;
+	}
+    VICVectAddr=0x0;									// Interrupt beendet
+}
+
+void T0isr(void) __irq{
+	static unsigned int sek = 0;
+	++sek;
+	T0EMR=T0EMR|0x02;									// Pin-Match auf 1 setzen
+	T0IR|=0x10;											// Ruecksetzen des Interrupt Flags
+	VICVectAddr=0x00;									// IR Ende
+}
+void initExIn(void){
+	PINSEL0=PINSEL0|0x80000000;
+	EXTMODE=EXTMODE|0x04;
+	VICVectCntl0=0x30;  								// Kanal 16 aktivieren (S. 67)
+  VICVectAddr0=(unsigned long) myEXTINT;
+  VICIntEnable=0x10000;
+}
+
+void initTimer(void){
+	T0PR=12500; 										// Prescaler: 12.5 Mhz = 1/1000 * 12.5 Mhz = 12500 Herz
+	T0TCR=0x02;			   								// Timer rücksetzen
+	T0MCR=0x03;											// IR und Reset
+	T0MR0=1000;											// 1 Sekunden
+	T0TCR=0x00;											// Timer anhalten
+ 	VICVectAddr4=(unsigned long) T0isr;					// isr Adresse
+	VICVectCntl4=0x24;									// Aktiv für Kanal 4 (Timer 0)
+	VICIntEnable=VICIntEnable |0x10;
+}
+
 int main(void){
    char choice;
    uartInit(initBaudrate(),3,readSwitchState3(),readSwitchState2(),readSwitchState1());
-		
-
+	 initExIn();
+	 initTimer();
+	 T0TCR=0x01;
 /* Hauptschleife */
 while (1) {
    sendMenue();
