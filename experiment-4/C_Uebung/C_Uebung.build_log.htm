@@ -10,12 +10,20 @@ Project File Date:  01/19/2025
 Rebuild target 'Simulator'
 assembling Startup.s...
 compiling C_Uebung.c...
-linking...
-Program Size: Code=3976 RO-data=228 RW-data=8 ZI-data=1256  
-".\C_Uebung.axf" - 0 Error(s), 0 Warning(s).
-                                                                                                 T0TCR=0x02;                                                     // Timer rücksetzen
-C_Uebung.c(217): error:  #137: expression must be a modifiable lvalue
-                                                                        } else {        uartSendString                                                  // sonst
+C_Uebung.c(109): error:  #20: identifier "VICVectCntl16" is undefined
+      VICVectCntl16 = 0x30;  // Kanal 16 aktivieren
+C_Uebung.c: 0 warnings, 1 error
+".\C_Uebung.axf" - 1 Error(s), 0 Warning(s).
+Target not created
+</pre>
+</body>
+</html>
+c(130): error:  #159: declaration is incompatible with previous "sendInt" (declared at line 124)
+  void sendInt(int value) {
+C_Uebung.c: 1 warning, 2 errors
+".\C_Uebung.axf" - 2 Error(s), 1 Warning(s).
+Target not created
+g                                                  // sonst
 C_Uebung.c: 0 warnings, 2 errors
 ".\C_Uebung.axf" - 2 Error(s), 0 Warning(s).
 Target not created

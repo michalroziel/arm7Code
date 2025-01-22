@@ -17,18 +17,9 @@
 /********************************************************************/
 
 #include <LPC21xx.H>  // LPC21xx Mikrocontroller Definitionen
+#include "C_Uebung.H"
 
-// UART-Konstanten
-#define PCLOCK 12500000   // Peripherie-Clock in Hz
-#define BAUDRATE 19200    // Baudrate der seriellen Schnittstelle
 
-// Funktionsprototypen
-void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable);
-void uartSendChar(char data);
-void uartSendString(char* str);
-char uartReadChar(void);
-void uartReadHexInput(char* inputBuffer, unsigned long* address);
-void memoryDumpHex(unsigned long address, int length);
 
 void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable) {
     unsigned int uartConfig = 0;
@@ -148,8 +139,6 @@ void memoryDumpHex(unsigned long address, int length) {
 int main(void) {
     char inputBuffer[9];  // Platz für die eingegebene Adresse (8 Zeichen + Nullterminierung)
     unsigned long address;
-	
-		
 	
     uartInit(BAUDRATE, 3, 1, 1, 1);  // UART initialisieren
 	

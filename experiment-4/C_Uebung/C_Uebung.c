@@ -10,7 +10,7 @@
 /*    Entwicklungsprogramm uVision für ARM-Mikrocontroller         */
 /*                                                                  */
 /********************************************************************/
-/*  Aufgaben-Nr.:        *          Versuch 3                       */
+/*  Aufgaben-Nr.:        *          Versuch 4                       */
 /*                       *                                          */
 /********************************************************************/
 /*  Gruppen-Nr.: 	     *                                          */
@@ -20,62 +20,32 @@
 /*                       *        Michal Roziel       5012845       */
 /*                       *                                          */
 /********************************************************************/
-/* 	Abgabedatum:         *        23.01.2025                        */
+/* 	Abgabedatum:         *        30.01.2025                        */
 /*                       *                                          */
 /********************************************************************/
 
 #include <LPC21xx.H>  /* LPC21xx Definitionen */
 #include "C_Uebung.H"
 
-/*** Globale Konstanten und Variablen ***/
-#define PCLOCK          12.5
-#define SWITCH_MASK1    0x10000  // Schalter an P0.16
-#define SWITCH_MASK2    0x20000  // Schalter an P0.17
-#define SWITCH_MASK3    0x1000000 // Schalter an P1.25
-#define INPUT_MASK      0x3C00   // Eingabemaske für BCD
-static const unsigned int baudrates[] = {110, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600};
-
-static unsigned int sek = 0;        // Sekunden-Zähler
-static unsigned int tasterzustand = 0;
-
-/*** Funktionsprototypen ***/
-void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable);
-void uartSendChar(char data);
-void uartSendString(char* str);
-char uartReadChar(void);
-
-unsigned int readInputBCD(void);
-unsigned int readSwitchState1(void);
-unsigned int readSwitchState2(void);
-unsigned int readSwitchState3(void);
-unsigned int initBaudrate(void);
-
-void initTimer(void);
-void initExIn(void);
-void myEXTINT(void) __irq;
-void T0isr(void) __irq;
-
-void sendMenu(void);
-void sendTime(int time);
-void sendInt(int value);
-
-/*** Implementierungen ***/
-
 /* UART Initialisierung */
 void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable) {
-    unsigned int uartConfig = (paritySelect << 1) | parityEnable;
-	  unsigned int divisor = PCLOCK / (16 * baudRate);
-    uartConfig = (uartConfig << 1) | stopBits;
-    uartConfig = (uartConfig << 2) | dataBits;
+    unsigned int uartConfig = 0;
+    unsigned int divisor;
+    // Konfiguration des UART-Modus
+    uartConfig = (8 + paritySelect);  // Parität
+    uartConfig = (uartConfig << 1) + parityEnable;  
+    uartConfig = (uartConfig << 1) + stopBits;  
+    uartConfig = (uartConfig << 2) + dataBits;  
 
-    PINSEL0 |= 0x05;  // P0.8 = TxD1, P0.9 = RxD1 aktivieren
-    U0LCR = uartConfig | 0x80;  // DLAB setzen
-    U0DLL = divisor % 256;
-    U0DLM = divisor / 256;
-    U0LCR &= ~0x80;  // DLAB zurücksetzen
-    U0FCR = 0x07;  // FIFO aktivieren
+    PINSEL0  |= 0x05; // P0.8 = TxD1, P0.9 = RxD1 für UART0 aktivieren
+
+    divisor = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
+    U0LCR = uartConfig;  // DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
+    U0DLL = divisor % 256;  // Niedriges Byte des Divisors
+    U0DLM = divisor / 256;   // Hohes Byte des Divisors
+    U0LCR = 0x1F;  // DLAB-Bit löschen, 8 Datenbits, 1 Stoppbit
+    U0FCR = 0x07;  // FIFO aktivieren und zurücksetzen
 }
-
 /* UART Zeichen senden */
 void uartSendChar(char data) {
     while (!(U0LSR & 0x20));  // Warte, bis das Transmit-Register bereit ist
@@ -201,7 +171,7 @@ int main(void) {
 
     while (1) {
 			    sendMenu();
-        choice = uartReadChar();
+          choice = uartReadChar();
         switch (choice) {
             case 's': case 'S':
                 T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;
