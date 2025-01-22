@@ -17,7 +17,7 @@ Section Cross References
     c_uebung.o(.text) refers to dfixu.o(x$fpl$dfixu) for __aeabi_d2uiz
     c_uebung.o(.text) refers to aeabi_sdiv.o(.text) for __aeabi_idivmod
     c_uebung.o(.text) refers to c_uebung.o(.constdata) for baudrates
-    c_uebung.o(.text) refers to c_uebung.o(.data) for tasterzustand
+    c_uebung.o(.text) refers to c_uebung.o(.data) for sek
     aeabi_sdiv.o(.text_udiv) refers to aeabi_sdiv.o(.text) for __arm_div2
     aeabi_sdiv_div0.o(.text_udiv) refers to aeabi_sdiv_div0.o(.text) for __arm_div2
     __main.o(!!!main) refers to rtentry.o(.ARM.Collect$$rtentry$$00000000) for __rt_entry
@@ -277,31 +277,31 @@ Image Symbol Table
     .ARM.Collect$$rtexit$$00000004           0x00000214   Section        8  rtexit2.o(.ARM.Collect$$rtexit$$00000004)
     .text                                    0x0000021c   Section       32  startup.o(.text)
     .text                                    0x0000023c   Section        0  c_uebung.o(.text)
-    .text                                    0x000009c4   Section      384  aeabi_sdiv.o(.text)
-    __arm_div8                               0x000009f0   ARM Code       0  aeabi_sdiv.o(.text)
-    __arm_div5                               0x00000a14   ARM Code       0  aeabi_sdiv.o(.text)
-    __arm_div2                               0x00000a38   ARM Code       0  aeabi_sdiv.o(.text)
-    __arm_div_large                          0x00000a74   ARM Code       0  aeabi_sdiv.o(.text)
-    .text                                    0x00000b44   Section        0  heapauxi.o(.text)
-    .text                                    0x00000b4c   Section       96  sys_stackheap_outer.o(.text)
-    .text                                    0x00000bac   Section        0  exit.o(.text)
-    .text                                    0x00000bb8   Section       12  libspace.o(.text)
-    .text                                    0x00000bcc   Section        0  sys_exit.o(.text)
-    .text                                    0x00000bd8   Section        4  use_no_semi.o(.text)
-    .text                                    0x00000bdc   Section        0  indicate_semi.o(.text)
-    x$fpl$ddiv                               0x00000bdc   Section      736  ddiv.o(x$fpl$ddiv)
-    ddiv_entry                               0x00000be4   ARM Code       0  ddiv.o(x$fpl$ddiv)
-    x$fpl$dfixu                              0x00000ebc   Section      112  dfixu.o(x$fpl$dfixu)
-    x$fpl$dflt                               0x00000f2c   Section       88  dflt_noclz.o(x$fpl$dflt)
-    x$fpl$dfltu                              0x00000f84   Section       12  dflt_noclz.o(x$fpl$dfltu)
-    x$fpl$dnaninf                            0x00000f90   Section      192  dnaninf.o(x$fpl$dnaninf)
-    x$fpl$dretinf                            0x00001050   Section       16  dretinf.o(x$fpl$dretinf)
-    .constdata                               0x00001060   Section       40  c_uebung.o(.constdata)
-    x$fpl$usenofp                            0x00001060   Section        0  usenofp.o(x$fpl$usenofp)
-    baudrates                                0x00001060   Data          40  c_uebung.o(.constdata)
+    .text                                    0x000008ec   Section      384  aeabi_sdiv.o(.text)
+    __arm_div8                               0x00000918   ARM Code       0  aeabi_sdiv.o(.text)
+    __arm_div5                               0x0000093c   ARM Code       0  aeabi_sdiv.o(.text)
+    __arm_div2                               0x00000960   ARM Code       0  aeabi_sdiv.o(.text)
+    __arm_div_large                          0x0000099c   ARM Code       0  aeabi_sdiv.o(.text)
+    .text                                    0x00000a6c   Section        0  heapauxi.o(.text)
+    .text                                    0x00000a74   Section       96  sys_stackheap_outer.o(.text)
+    .text                                    0x00000ad4   Section        0  exit.o(.text)
+    .text                                    0x00000ae0   Section       12  libspace.o(.text)
+    .text                                    0x00000af4   Section        0  sys_exit.o(.text)
+    .text                                    0x00000b00   Section        4  use_no_semi.o(.text)
+    .text                                    0x00000b04   Section        0  indicate_semi.o(.text)
+    x$fpl$ddiv                               0x00000b04   Section      736  ddiv.o(x$fpl$ddiv)
+    ddiv_entry                               0x00000b0c   ARM Code       0  ddiv.o(x$fpl$ddiv)
+    x$fpl$dfixu                              0x00000de4   Section      112  dfixu.o(x$fpl$dfixu)
+    x$fpl$dflt                               0x00000e54   Section       88  dflt_noclz.o(x$fpl$dflt)
+    x$fpl$dfltu                              0x00000eac   Section       12  dflt_noclz.o(x$fpl$dfltu)
+    x$fpl$dnaninf                            0x00000eb8   Section      192  dnaninf.o(x$fpl$dnaninf)
+    x$fpl$dretinf                            0x00000f78   Section       16  dretinf.o(x$fpl$dretinf)
+    .constdata                               0x00000f88   Section      196  c_uebung.o(.constdata)
+    x$fpl$usenofp                            0x00000f88   Section        0  usenofp.o(x$fpl$usenofp)
+    baudrates                                0x00000f88   Data          40  c_uebung.o(.constdata)
     .data                                    0x40000000   Section        8  c_uebung.o(.data)
-    tasterzustand                            0x40000000   Data           4  c_uebung.o(.data)
-    sek                                      0x40000004   Data           4  c_uebung.o(.data)
+    sek                                      0x40000000   Data           4  c_uebung.o(.data)
+    tasterzustand                            0x40000004   Data           4  c_uebung.o(.data)
     .bss                                     0x40000008   Section       96  libspace.o(.bss)
     HEAP                                     0x40000068   Section        0  startup.o(HEAP)
     STACK                                    0x40000068   Section     1160  startup.o(STACK)
@@ -392,52 +392,52 @@ Image Symbol Table
     __rt_exit_prels_1                        0x00000210   ARM Code       0  rtexit2.o(.ARM.Collect$$rtexit$$00000002)
     __rt_exit_exit                           0x00000214   ARM Code       0  rtexit2.o(.ARM.Collect$$rtexit$$00000004)
     __user_initial_stackheap                 0x0000021c   ARM Code       0  startup.o(.text)
-    uartInit                                 0x0000023c   ARM Code     156  c_uebung.o(.text)
-    readInputBCD                             0x000002d8   ARM Code      20  c_uebung.o(.text)
-    initBaudrate                             0x000002ec   ARM Code      40  c_uebung.o(.text)
-    uartSendChar                             0x00000314   ARM Code      32  c_uebung.o(.text)
-    uartSendString                           0x00000334   ARM Code      48  c_uebung.o(.text)
-    readSwitchState1                         0x00000364   ARM Code      20  c_uebung.o(.text)
-    readSwitchState2                         0x00000378   ARM Code      20  c_uebung.o(.text)
-    readSwitchState3                         0x0000038c   ARM Code      16  c_uebung.o(.text)
-    sendMenue                                0x0000039c   ARM Code     112  c_uebung.o(.text)
-    uartReadChar                             0x0000040c   ARM Code      32  c_uebung.o(.text)
-    sendint                                  0x0000042c   ARM Code     160  c_uebung.o(.text)
-    sendTime                                 0x000004cc   ARM Code     500  c_uebung.o(.text)
-    myEXTINT                                 0x000006c0   ARM Code     184  c_uebung.o(.text)
-    T0isr                                    0x00000778   ARM Code      76  c_uebung.o(.text)
-    initExIn                                 0x000007c4   ARM Code      72  c_uebung.o(.text)
-    initTimer                                0x0000080c   ARM Code      84  c_uebung.o(.text)
-    main                                     0x00000860   ARM Code     356  c_uebung.o(.text)
-    __aeabi_idiv                             0x000009c4   ARM Code       0  aeabi_sdiv.o(.text)
-    __aeabi_idivmod                          0x000009c4   ARM Code     384  aeabi_sdiv.o(.text)
-    __use_two_region_memory                  0x00000b45   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_escrow$2region                 0x00000b47   Thumb Code     2  heapauxi.o(.text)
-    __rt_heap_expand$2region                 0x00000b49   Thumb Code     2  heapauxi.o(.text)
-    __user_setup_stackheap                   0x00000b4c   ARM Code      96  sys_stackheap_outer.o(.text)
-    exit                                     0x00000bad   Thumb Code    12  exit.o(.text)
-    __user_libspace                          0x00000bb8   ARM Code      12  libspace.o(.text)
-    __user_perproc_libspace                  0x00000bb8   ARM Code       0  libspace.o(.text)
-    __user_perthread_libspace                0x00000bb8   ARM Code       0  libspace.o(.text)
-    Inline ARM to Thumb Veneer to _sys_exit  0x00000bc4   ARM Code       8  sys_exit.o(.text)
-    _sys_exit                                0x00000bcd   Thumb Code     8  sys_exit.o(.text)
-    __I$use$semihosting                      0x00000bd8   ARM Code       0  use_no_semi.o(.text)
-    __use_no_semihosting_swi                 0x00000bd8   ARM Code       4  use_no_semi.o(.text)
-    __aeabi_ddiv                             0x00000bdc   ARM Code       0  ddiv.o(x$fpl$ddiv)
-    __semihosting_library_function           0x00000bdc   ARM Code       0  indicate_semi.o(.text)
-    _ddiv                                    0x00000bdc   ARM Code     600  ddiv.o(x$fpl$ddiv)
-    __aeabi_d2uiz                            0x00000ebc   ARM Code       0  dfixu.o(x$fpl$dfixu)
-    _dfixu                                   0x00000ebc   ARM Code     112  dfixu.o(x$fpl$dfixu)
-    __aeabi_i2d                              0x00000f2c   ARM Code       0  dflt_noclz.o(x$fpl$dflt)
-    _dflt                                    0x00000f2c   ARM Code      88  dflt_noclz.o(x$fpl$dflt)
-    __dflt_normalise                         0x00000f3c   ARM Code       0  dflt_noclz.o(x$fpl$dflt)
-    __aeabi_ui2d                             0x00000f84   ARM Code       0  dflt_noclz.o(x$fpl$dfltu)
-    _dfltu                                   0x00000f84   ARM Code      12  dflt_noclz.o(x$fpl$dfltu)
-    __fpl_dnaninf                            0x00000f90   ARM Code     192  dnaninf.o(x$fpl$dnaninf)
-    __fpl_dretinf                            0x00001050   ARM Code      16  dretinf.o(x$fpl$dretinf)
-    __I$use$fp                               0x00001060   Number         0  usenofp.o(x$fpl$usenofp)
-    Region$$Table$$Base                      0x00001088   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x000010a8   Number         0  anon$$obj.o(Region$$Table)
+    uartInit                                 0x0000023c   ARM Code     164  c_uebung.o(.text)
+    uartSendChar                             0x000002e0   ARM Code      32  c_uebung.o(.text)
+    uartSendString                           0x00000300   ARM Code      40  c_uebung.o(.text)
+    uartReadChar                             0x00000328   ARM Code      32  c_uebung.o(.text)
+    readSwitchState1                         0x00000348   ARM Code      20  c_uebung.o(.text)
+    readSwitchState2                         0x0000035c   ARM Code      20  c_uebung.o(.text)
+    readSwitchState3                         0x00000370   ARM Code      16  c_uebung.o(.text)
+    readInputBCD                             0x00000380   ARM Code      20  c_uebung.o(.text)
+    initBaudrate                             0x00000394   ARM Code      48  c_uebung.o(.text)
+    T0isr                                    0x000003c4   ARM Code      60  c_uebung.o(.text)
+    initTimer                                0x00000400   ARM Code      84  c_uebung.o(.text)
+    myEXTINT                                 0x00000454   ARM Code     152  c_uebung.o(.text)
+    initExIn                                 0x000004ec   ARM Code      72  c_uebung.o(.text)
+    sendMenu                                 0x00000534   ARM Code      44  c_uebung.o(.text)
+    sendInt                                  0x00000560   ARM Code     128  c_uebung.o(.text)
+    sendTime                                 0x000005e0   ARM Code     296  c_uebung.o(.text)
+    main                                     0x00000708   ARM Code     408  c_uebung.o(.text)
+    __aeabi_idiv                             0x000008ec   ARM Code       0  aeabi_sdiv.o(.text)
+    __aeabi_idivmod                          0x000008ec   ARM Code     384  aeabi_sdiv.o(.text)
+    __use_two_region_memory                  0x00000a6d   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_escrow$2region                 0x00000a6f   Thumb Code     2  heapauxi.o(.text)
+    __rt_heap_expand$2region                 0x00000a71   Thumb Code     2  heapauxi.o(.text)
+    __user_setup_stackheap                   0x00000a74   ARM Code      96  sys_stackheap_outer.o(.text)
+    exit                                     0x00000ad5   Thumb Code    12  exit.o(.text)
+    __user_libspace                          0x00000ae0   ARM Code      12  libspace.o(.text)
+    __user_perproc_libspace                  0x00000ae0   ARM Code       0  libspace.o(.text)
+    __user_perthread_libspace                0x00000ae0   ARM Code       0  libspace.o(.text)
+    Inline ARM to Thumb Veneer to _sys_exit  0x00000aec   ARM Code       8  sys_exit.o(.text)
+    _sys_exit                                0x00000af5   Thumb Code     8  sys_exit.o(.text)
+    __I$use$semihosting                      0x00000b00   ARM Code       0  use_no_semi.o(.text)
+    __use_no_semihosting_swi                 0x00000b00   ARM Code       4  use_no_semi.o(.text)
+    __aeabi_ddiv                             0x00000b04   ARM Code       0  ddiv.o(x$fpl$ddiv)
+    __semihosting_library_function           0x00000b04   ARM Code       0  indicate_semi.o(.text)
+    _ddiv                                    0x00000b04   ARM Code     600  ddiv.o(x$fpl$ddiv)
+    __aeabi_d2uiz                            0x00000de4   ARM Code       0  dfixu.o(x$fpl$dfixu)
+    _dfixu                                   0x00000de4   ARM Code     112  dfixu.o(x$fpl$dfixu)
+    __aeabi_i2d                              0x00000e54   ARM Code       0  dflt_noclz.o(x$fpl$dflt)
+    _dflt                                    0x00000e54   ARM Code      88  dflt_noclz.o(x$fpl$dflt)
+    __dflt_normalise                         0x00000e64   ARM Code       0  dflt_noclz.o(x$fpl$dflt)
+    __aeabi_ui2d                             0x00000eac   ARM Code       0  dflt_noclz.o(x$fpl$dfltu)
+    _dfltu                                   0x00000eac   ARM Code      12  dflt_noclz.o(x$fpl$dfltu)
+    __fpl_dnaninf                            0x00000eb8   ARM Code     192  dnaninf.o(x$fpl$dnaninf)
+    __fpl_dretinf                            0x00000f78   ARM Code      16  dretinf.o(x$fpl$dretinf)
+    __I$use$fp                               0x00000f88   Number         0  usenofp.o(x$fpl$usenofp)
+    Region$$Table$$Base                      0x0000104c   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x0000106c   Number         0  anon$$obj.o(Region$$Table)
     __libspace_start                         0x40000008   Data          96  libspace.o(.bss)
     __temporary_stack_top$libspace           0x40000068   Data           0  libspace.o(.bss)
 
@@ -449,9 +449,9 @@ Memory Map of the image
 
   Image Entry point : 0x00000110
 
-  Load Region LR_IROM1 (Base: 0x00000000, Size: 0x000010b0, Max: 0x00040000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x00000000, Size: 0x00001074, Max: 0x00040000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Base: 0x00000000, Size: 0x000010a8, Max: 0x00040000, ABSOLUTE)
+    Execution Region ER_IROM1 (Base: 0x00000000, Size: 0x0000106c, Max: 0x00040000, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -505,26 +505,26 @@ Memory Map of the image
     0x00000210   0x00000004   Code   RO          163    .ARM.Collect$$rtexit$$00000003  c_t.l(rtexit2.o)
     0x00000214   0x00000008   Code   RO          164    .ARM.Collect$$rtexit$$00000004  c_t.l(rtexit2.o)
     0x0000021c   0x00000020   Code   RO            4    .text               startup.o
-    0x0000023c   0x00000788   Code   RO           11    .text               c_uebung.o
-    0x000009c4   0x00000180   Code   RO           32    .text               c_t.l(aeabi_sdiv.o)
-    0x00000b44   0x00000006   Code   RO           48    .text               c_t.l(heapauxi.o)
-    0x00000b4a   0x00000002   PAD
-    0x00000b4c   0x00000060   Code   RO           91    .text               c_t.l(sys_stackheap_outer.o)
-    0x00000bac   0x0000000c   Code   RO           93    .text               c_t.l(exit.o)
-    0x00000bb8   0x0000000c   Code   RO          105    .text               c_t.l(libspace.o)
-    0x00000bc4   0x00000008   Ven    RO          159    .text               c_t.l(sys_exit.o)
-    0x00000bcc   0x0000000c   Code   RO          159    .text               c_t.l(sys_exit.o)
-    0x00000bd8   0x00000004   Code   RO          180    .text               c_t.l(use_no_semi.o)
-    0x00000bdc   0x00000000   Code   RO          182    .text               c_t.l(indicate_semi.o)
-    0x00000bdc   0x000002e0   Code   RO           53    x$fpl$ddiv          fz_ts.l(ddiv.o)
-    0x00000ebc   0x00000070   Code   RO           56    x$fpl$dfixu         fz_ts.l(dfixu.o)
-    0x00000f2c   0x00000058   Code   RO           61    x$fpl$dflt          fz_ts.l(dflt_noclz.o)
-    0x00000f84   0x0000000c   Code   RO           60    x$fpl$dfltu         fz_ts.l(dflt_noclz.o)
-    0x00000f90   0x000000c0   Code   RO           69    x$fpl$dnaninf       fz_ts.l(dnaninf.o)
-    0x00001050   0x00000010   Code   RO           71    x$fpl$dretinf       fz_ts.l(dretinf.o)
-    0x00001060   0x00000000   Code   RO           73    x$fpl$usenofp       fz_ts.l(usenofp.o)
-    0x00001060   0x00000028   Data   RO           12    .constdata          c_uebung.o
-    0x00001088   0x00000020   Data   RO          231    Region$$Table       anon$$obj.o
+    0x0000023c   0x000006b0   Code   RO           11    .text               c_uebung.o
+    0x000008ec   0x00000180   Code   RO           32    .text               c_t.l(aeabi_sdiv.o)
+    0x00000a6c   0x00000006   Code   RO           48    .text               c_t.l(heapauxi.o)
+    0x00000a72   0x00000002   PAD
+    0x00000a74   0x00000060   Code   RO           91    .text               c_t.l(sys_stackheap_outer.o)
+    0x00000ad4   0x0000000c   Code   RO           93    .text               c_t.l(exit.o)
+    0x00000ae0   0x0000000c   Code   RO          105    .text               c_t.l(libspace.o)
+    0x00000aec   0x00000008   Ven    RO          159    .text               c_t.l(sys_exit.o)
+    0x00000af4   0x0000000c   Code   RO          159    .text               c_t.l(sys_exit.o)
+    0x00000b00   0x00000004   Code   RO          180    .text               c_t.l(use_no_semi.o)
+    0x00000b04   0x00000000   Code   RO          182    .text               c_t.l(indicate_semi.o)
+    0x00000b04   0x000002e0   Code   RO           53    x$fpl$ddiv          fz_ts.l(ddiv.o)
+    0x00000de4   0x00000070   Code   RO           56    x$fpl$dfixu         fz_ts.l(dfixu.o)
+    0x00000e54   0x00000058   Code   RO           61    x$fpl$dflt          fz_ts.l(dflt_noclz.o)
+    0x00000eac   0x0000000c   Code   RO           60    x$fpl$dfltu         fz_ts.l(dflt_noclz.o)
+    0x00000eb8   0x000000c0   Code   RO           69    x$fpl$dnaninf       fz_ts.l(dnaninf.o)
+    0x00000f78   0x00000010   Code   RO           71    x$fpl$dretinf       fz_ts.l(dretinf.o)
+    0x00000f88   0x00000000   Code   RO           73    x$fpl$usenofp       fz_ts.l(usenofp.o)
+    0x00000f88   0x000000c4   Data   RO           12    .constdata          c_uebung.o
+    0x0000104c   0x00000020   Data   RO          231    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Base: 0x40000000, Size: 0x000004f0, Max: 0x00004000, ABSOLUTE)
@@ -544,11 +544,11 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-      1928        396         40          8          0       5675   c_uebung.o
+      1712        236        196          8          0       5714   c_uebung.o
        304         60          0          0       1160        484   startup.o
 
     ----------------------------------------------------------------------
-      2232        456         72          8       1160       6159   Object Totals
+      2016        296        228          8       1160       6198   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          0          0          0          0          0          0   (incl. Padding)
 
@@ -605,15 +605,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      4192        620         72          8       1256       6807   Grand Totals
-      4192        620         72          8       1256       6807   ELF Image Totals
-      4192        620         72          8          0          0   ROM Totals
+      3976        460        228          8       1256       6846   Grand Totals
+      3976        460        228          8       1256       6846   ELF Image Totals
+      3976        460        228          8          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 4264 (   4.16kB)
+    Total RO  Size (Code + RO Data)                 4204 (   4.11kB)
     Total RW  Size (RW Data + ZI Data)              1264 (   1.23kB)
-    Total ROM Size (Code + RO Data + RW Data)       4272 (   4.17kB)
+    Total ROM Size (Code + RO Data + RW Data)       4212 (   4.11kB)
 
 ==============================================================================
 
