@@ -117,22 +117,28 @@ void uartReadHexInput(char* inputBuffer, unsigned long* address) {
 
 // Speicherinhalt als Hexadezimalwerte ausgeben
 void memoryDumpHex(unsigned long address, int length) {
-    char* ptr = (char*) address;  // Speicheradresse casten
-    int i;
-
+    char* ptr = (char*) address;  // Speicheradresse auf char Zeiger umwandeln,
+    int i;                        // um Byteweise zugreifen zu können
     for (i = 0; i < length; i++) {
-        unsigned char value = ptr[i];  // Byte auslesen
+        unsigned char value = ptr[i];  // Jedes Byte nacheinander auslesen
 
-        // High- und Low-Nibble extrahieren
-        char highNibble = (value >> 4) & 0x0F;
-        char lowNibble = value & 0x0F;
+        // Upper-ByteHälfte und Lower-ByteHälfte extrahieren
+        // Wir shiften um 4 und maskieren die restlichen Bits
+        char upperHalf = (value >> 4) & 0x0F;
+        char lowerhalf = value & 0x0F;
 
-        // In Hex umwandeln und senden
-        uartSendChar(highNibble < 10 ? '0' + highNibble : 'A' + (highNibble - 10));
-        uartSendChar(lowNibble < 10 ? '0' + lowNibble : 'A' + (lowNibble - 10));
+        // numerischen Wert als ASCII anzeigen:
+        // '0' hat den Wert 48, 'A' hat den Wert 65.
+        // Wenn upperHalf < 10 ist, wird '0' + upperHalf ausgeführt.
+        // Bsp :  48 + 5  = 53  (-> 5 in ASCII)
+        // Bsp :  65 + (B - 10) (-> 66 = B in ASCII)
+        uartSendChar(upperHalf < 10 ? '0' + upperHalf : 'A' + (upperHalf - 10));
+        // lowerHalf analog zu upperHalf
+        uartSendChar(lowerHalf < 10 ? '0' + lowerHalf : 'A' + (lowerHalf - 10));
 
-        uartSendChar(' ');  // Leerzeichen für bessere Lesbarkeit
+        uartSendChar(' ');  // Leerzeichen für visuelles
     }
+    // Sende eines Returns und Line-Feed
     uartSendString("\r\n");
 }
 
