@@ -63,6 +63,7 @@ void uartSendString(char* str) {
         uartSendChar(str[i]);  // Zeichenweise senden
         i++;
     }
+
 }
 
 // Zeichen über UART empfangen
@@ -76,6 +77,8 @@ void uartReadHexInput(char* inputBuffer, unsigned long* address) {
     char receivedChar;
     int i;
     *address = 0;  // Adresse initialisieren
+
+
 
     for (i = 0; i < 8; i++) {
         receivedChar = uartReadChar();  // Zeichen empfangen
@@ -103,6 +106,20 @@ void uartReadHexInput(char* inputBuffer, unsigned long* address) {
             i--;  // Wiederhole diese Stelle
         }
     }
+
+		do {
+
+			if ( receivedChar == '\r'){
+				break;
+			}
+			receivedChar = uartReadChar();
+
+
+			uartSendChar(receivedChar);
+			uartSendString(" ist ein ungueltiges Zeichen zum Abschluss der Eingabe - nur CR akzeptiert !");
+
+
+		}while (receivedChar != '\r');
 
     inputBuffer[i] = '\0';  // Nullterminierung für String
 }
