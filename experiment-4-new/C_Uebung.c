@@ -26,7 +26,7 @@ void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBit
     uartConfig = (uartConfig << 1) + stopBits;  
     uartConfig = (uartConfig << 2) + dataBits;  
 
-    PINSEL0 |= 0x05;  // P0.8 = TxD1, P0.9 = RxD1 für UART1 aktivieren
+    PINSEL0 |= 0x05;  // P0.0 = TxD0, P0.1 = RxD0 für UART0 aktivieren
 
     Frequenzteiler = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
                                                 // DLAB : einstellung BAUD
