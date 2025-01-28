@@ -13,7 +13,7 @@
 /*  Name / Matrikel-Nr.: *      Valentin Straßer                    */
 /*                       *      Michal Roziel                       */
 /********************************************************************/
-/*  Abgabedatum:         *      16.01.2025                          */
+/*  Abgabedatum:         *      23.01.2025                          */
 /********************************************************************/
 
 #include <LPC21xx.H>  // LPC21xx Mikrocontroller Definitionen
@@ -114,7 +114,7 @@ void memoryDumpHex(unsigned long address, unsigned int length) {
         unsigned char value = ptr[i];           // aktuelles Byte auslesen
 
 				// Upper-Byte Hälfte und Lower-ByteHälfte extrahieren
-        char upperHalf = (value >> 4) & 0x0F    // um 4 shiften und mask. zum extrahieren
+        char upperHalf = (value >> 4) & 0x0F;    // um 4 shiften und mask. zum extrahieren
         char lowerHalf = value & 0x0F;					// Bit-maske
 
         uartSendChar(upperHalf < 10 ? '0' + upperHalf : 'A' + (upperHalf - 10));

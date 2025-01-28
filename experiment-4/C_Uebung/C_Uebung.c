@@ -41,17 +41,17 @@ void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBit
 
     Frequenzteiler = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
                                                 // DLAB : einstellung BAUD
-    U1LCR = DLAB_BIT | uartConfig;  						// DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
-    U1DLL = Frequenzteiler % 256;  							// Niedriges Byte des FrequenzTeilers
-    U1DLM = Frequenzteiler / 256;   						// Hohes Byte des FrequenzTeilers
-    U1LCR = uartConfig;													// DLAB-Bit löschen
-    U1FCR = UART_FIFO_ENABLE;  									// FIFO aktivieren und zurücksetzen
+    U0LCR = DLAB_BIT | uartConfig;  						// DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
+    U0DLL = Frequenzteiler % 256;  							// Niedriges Byte des FrequenzTeilers
+    U0DLM = Frequenzteiler / 256;   						// Hohes Byte des FrequenzTeilers
+    U0LCR = uartConfig;													// DLAB-Bit löschen
+    U0FCR = UART_FIFO_ENABLE;  									// FIFO aktivieren und zurücksetzen
 }
 
 /* UART Zeichen senden */
 void uartSendChar(char data) {
-    while (!(U1LSR & 0x20));  // Warte, bis das Transmit-Register bereit ist
-    U1THR = data;							// U0THR
+    while (!(U0LSR & 0x20));  // Warte, bis das Transmit-Register bereit ist
+    U0THR = data;							// U0THR
 }
 
 /* UART String senden */
@@ -63,8 +63,8 @@ void uartSendString(char* str) {
 
 /* UART Zeichen empfangen */
 char uartReadChar(void) {
-    while (!(U1LSR & 0x01));  // Warte, bis ein Zeichen empfangen wurde
-    return U1RBR;
+    while (!(U0LSR & 0x01));  // Warte, bis ein Zeichen empfangen wurde
+    return U0RBR;
 }
 
 /* Schalterzustand lesen */

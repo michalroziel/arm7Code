@@ -659,8 +659,8 @@ ARM Macro Assembler    Page 11
               00000400 
               00000000 
 Command Line: --debug --xref --apcs=interwork --depend=.\startup.d -o.\startup.
-o -IC:\Keil_ARM\ARM\RV31\INC -IC:\Keil_ARM\ARM\CMSIS\Include -IC:\Keil_ARM\ARM\
-Inc\Philips --predefine="__EVAL SETA 1" --list=.\startup.lst Startup.s
+o -IC:\Keil\ARM\RV31\INC -IC:\Keil\ARM\CMSIS\Include -IC:\Keil\ARM\Inc\Philips 
+--predefine="__EVAL SETA 1" --list=.\startup.lst Startup.s
 
 
 

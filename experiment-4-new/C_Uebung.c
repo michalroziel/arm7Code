@@ -1,8 +1,8 @@
 /********************************************************************/
-/*  Hochschule fuer Technik und Wirtschaft                          */
-/*  Fakultät fuer Ingenieurwissenschaften                           */
-/*  Labor fuer Eingebettete Systeme                                 */
-/*  Mikroprozessortechnik                                           */
+/* Hochschule fuer Technik und Wirtschaft                          */
+/* Fakultät fuer Ingenieurwissenschaften                           */
+/* Labor fuer Eingebettete Systeme                                 */
+/* Mikroprozessortechnik                                           */
 /********************************************************************/
 /*                                                                  */
 /*  C_Übung.C:                                                      */
@@ -19,169 +19,197 @@
 #include <LPC21xx.H>  // LPC21xx Mikrocontroller Definitionen
 #include "C_Uebung.H"
 
+// UART initialisieren
 void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable) {
     unsigned int uartConfig = 0;
     unsigned int Frequenzteiler;
-    uartConfig = (paritySelect << 1) + parityEnable;  
-    uartConfig = (uartConfig << 1) + stopBits;  
-    uartConfig = (uartConfig << 2) + dataBits;  
 
-    PINSEL0 |= 0x05;  // P0.0 = TxD0, P0.1 = RxD0 für UART0 aktivieren
+    // UART-Konfiguration erstellen
+    uartConfig = (paritySelect << 1) + parityEnable;
+    uartConfig = (uartConfig << 1) + stopBits;
+    uartConfig = (uartConfig << 2) + (dataBits-5);
 
-    Frequenzteiler = PCLOCK / (16 * baudRate);  // Baudratenteiler berechnen
-                                                // DLAB : einstellung BAUD
-    U0LCR = DLAB_BIT | uartConfig;  						// DLAB-Bit setzen, 8 Datenbits, 1 Stoppbit
-    U0DLL = Frequenzteiler % 256;  							// Niedriges Byte des FrequenzTeilers
-    U0DLM = Frequenzteiler / 256;   						// Hohes Byte des FrequenzTeilers
-    U0LCR = uartConfig;													// DLAB-Bit löschen
-    U0FCR = UART_FIFO_ENABLE;  									// FIFO aktivieren und zurücksetzen
+    // UART0 an P0.0 (TxD0) und P0.1 (RxD0) aktivieren
+    PINSEL0 |= 0x05;
+
+    // Baudratenteiler berechnen
+    Frequenzteiler = PCLOCK / (16 * baudRate);
+
+    // UART-Register konfigurieren
+    U0LCR = DLAB_BIT | uartConfig;          // DLAB-Bit setzen, UART-Konfiguration
+    U0DLL = Frequenzteiler % 256;          // Niedriges Byte des Baudratenteilers
+    U0DLM = Frequenzteiler / 256;          // Hohes Byte des Baudratenteilers
+    U0LCR = uartConfig;                    // DLAB-Bit löschen
+    U0FCR = UART_FIFO_ENABLE;              // FIFO aktivieren
 }
 
-unsigned int readSwitchState1(void){
-	return (IOPIN0>> 16) & 1;
+// Schalterzustand von P0.16 lesen
+unsigned int readSwitchState1(void) {
+    return (IOPIN0 >> 16) & 1;
 }
 
-unsigned int readSwitchState2(void){
-	return (IOPIN0>> 17) & 1;
+// Schalterzustand von P0.17 lesen
+unsigned int readSwitchState2(void) {
+    return (IOPIN0 >> 17) & 1;
 }
 
-unsigned int readSwitchState3(void){
-	return (IOPIN1 >> 25) & 1;
+// Schalterzustand von P1.25 lesen
+unsigned int readSwitchState3(void) {
+    return (IOPIN1 >> 25) & 1;
 }
 
-/* BCD Eingang lesen */
-unsigned int readInputBCD(void) {       
+// BCD-Eingang von P0.10-P0.13 lesen
+unsigned int readInputBCD(void) {
     return (IOPIN0 >> 10) & 0xF;
 }
 
-/* Menüs senden */
+// Menü über UART senden
 void sendMenu(void) {
     uartSendString("\r\nStopp-Uhr\r\n");
-	  uartSendString("	Start und Anhalten durch druecken der Interrupt-Taste\r\n");
-    uartSendString("	s,S - Start/Stop\r\n");
-    uartSendString("	a,A - Anzeigen\r\n");
-    uartSendString("	r,R - Reset\r\n");
+    uartSendString("\tStart und Anhalten durch Druecken der Interrupt-Taste\r\n");
+    uartSendString("\ts,S - Start/Stop\r\n");
+    uartSendString("\ta,A - Anzeigen\r\n");
+    uartSendString("\tr,R - Reset\r\n");
 }
 
-/* Baudrate initialisieren */
+// Baudrate initialisieren basierend auf BCD-Eingang
 unsigned int initBaudrate(void) {
     unsigned int index = readInputBCD();
     return (index > 9) ? baudrates[9] : baudrates[index];
 }
 
-// Zeichen über UART senden
+// Einzelnes Zeichen über UART senden
 void uartSendChar(char data) {
-    while ((U0LSR & UART_READY_BIT) == 0);  		// Warte, bis das Transmit-Register bereit ist
-    U0THR = data;  															// char send, sobald beschrieben -> senden
+    while ((U0LSR & UART_READY_BIT) == 0);  // Warten, bis UART bereit ist
+    U0THR = data;  // Zeichen senden
 }
 
 // String über UART senden
 void uartSendString(char* str) {
     int i = 0;
-    while (str[i] != '\0') {										// Null Terminierung
-        uartSendChar(str[i]); 								  // Zeichenweise senden
+    while (str[i] != '\0') {  // Bis zur Nullterminierung
+        uartSendChar(str[i]);  // Zeichenweise senden
         i++;
     }
-	}
+}
 
 // Zeichen über UART empfangen
 char uartReadChar(void) {
-    while (!(U0LSR & UART_RX_READY));  					// Warte auf empfangenes Zeichen
-    return U0RBR;  															// Zeichen zurückgeben
-}																								// DR Bit - Bit 0 in LSR
+    while (!(U0LSR & UART_RX_READY));  // Warten, bis ein Zeichen empfangen wurde
+    return U0RBR;  // Empfangenes Zeichen zurückgeben
+}
 
-
-/* Timer Initialisierung */
+// Timer initialisieren
 void initTimer(void) {
-    T0PR = 12500;  // Prescaler
+    T0PR = 12500;  // Prescaler für den Timer
     T0TCR = 0x02;  // Timer zurücksetzen
-    T0MCR = 0x03;  // Interrupt und Reset
+    T0MCR = 0x03;  // Interrupt und Reset bei Übereinstimmung
     T0MR0 = 1000;  // 1 Sekunde
     T0TCR = 0x00;  // Timer anhalten
 
+    // Interrupt-Konfiguration
     VICVectAddr4 = (unsigned long)T0isr;
     VICVectCntl4 = 0x24;
     VICIntEnable |= 0x10;
 }
 
-/* Interrupt Initialisierung */
+// Externen Interrupt initialisieren
 void initExIn(void) {
     PINSEL0 |= 0x80000000;  // EINT2 aktivieren
-    EXTMODE |= 0x04;  // Flankengetriggerter Interrupt
-    VICVectCntl0 = 0x30;  // Kanal 16 aktivieren
+    EXTMODE |= 0x04;        // Flankengesteuerter Interrupt
+    VICVectCntl0 = 0x30;    // Kanal 16 aktivieren
     VICVectAddr0 = (unsigned long)myEXTINT;
-    VICIntEnable = 0x10000;  // EINT2 aktivieren
+    VICIntEnable = 0x10000; // EINT2 aktivieren
 }
 
-/* Integer senden */
+// Integer über UART senden
 void sendInt(int value) {
     char buffer[5];
     int i = 0;
-    if (value == 0) buffer[i++] = '0';
+
+    // Sonderfall: Wert ist 0
+    if (value == 0) {
+        buffer[i++] = '0';
+    }
+
+    // Zahl in umgekehrter Reihenfolge in den Buffer schreiben
     while (value > 0) {
         buffer[i++] = (value % 10) + '0';
         value /= 10;
     }
-    while (i--) uartSendChar(buffer[i]);
+
+    // Zahl korrekt herum ausgeben
+    while (i--) {
+        uartSendChar(buffer[i]);
+    }
 }
 
-/* Externer Interrupt Handler */
+// Externer Interrupt-Handler
 void myEXTINT(void) __irq {
-	  static unsigned int tasterzustand = 0;
+    static unsigned int tasterzustand = 0;
+
     if (tasterzustand > 0) {
-        T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;
+        T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;  // Timer starten oder anhalten
         uartSendString((T0TCR == 0x01) ? "Timer gestartet!\r\n" : "Timer angehalten!\r\n");
         tasterzustand = 0;
     } else {
         tasterzustand++;
     }
-    EXTINT = 0x04;
+
+    EXTINT = 0x04;  // Interrupt-Flag löschen
     VICVectAddr = 0x00;
 }
 
-/* Timer Interrupt Handler */
+// Timer-Interrupt-Handler
 void T0isr(void) __irq {
     sek++;
-	  IOCLR0=SEGMENT;	       	        	// Setzt Low-Spannungspegel an P0.18-P0.24 
-		IOSET0=bcd[sek%10];										// Initialisiert den BCD auf 0
-    T0IR |= 0x10;
+    IOCLR0 = SEGMENT;            // Anzeige zurücksetzen
+    IOSET0 = bcd[sek % 10];      // Anzeige aktualisieren
+    T0IR |= 0x10;                // Interrupt-Flag löschen
     VICVectAddr = 0x00;
 }
 
-/* Zeit senden */
+// Zeit über UART senden
 void sendTime(int time) {
     int h = time / 3600;
     int m = (time % 3600) / 60;
     int s = time % 60;
+
     uartSendString("Zeit: ");
-		if(h<10) sendInt(0);
-    sendInt(h); 
-	  uartSendChar(':');
-	  if(m<10) sendInt(0);
+    if (h < 10) sendInt(0);
+    sendInt(h);
+    uartSendChar(':');
+    if (m < 10) sendInt(0);
     sendInt(m);
-	  uartSendChar(':');
-	  if(s<10) sendInt(0);
-    sendInt(s); 
-		uartSendString("\r\n");
-}
-void initSeg(void){
-	  IODIR0=SEGMENT;  		       				// Ausgang von P0.18-P.0.24 (BCD Anzeige) - SETZT 
-		IOCLR0=SEGMENT;	       	        	// Setzt Low-Spannungspegel an P0.18-P0.24 
-		IOSET0=bcd[0];										// Initialisiert den BCD auf 0
+    uartSendChar(':');
+    if (s < 10) sendInt(0);
+    sendInt(s);
+    uartSendString("\r\n");
 }
 
+// Siebensegmentanzeige initialisieren
+void initSeg(void) {
+    IODIR0 = SEGMENT;  // P0.18-P0.24 als Ausgang setzen
+    IOCLR0 = SEGMENT;  // Ausgang zurücksetzen
+    IOSET0 = bcd[0];   // Anzeige auf 0 setzen
+}
+
+// Hauptprogramm
 int main(void) {
-	  
-		char choice;
-	  sek = 215990;
-    uartInit(initBaudrate(), 3, readSwitchState3(), readSwitchState2(), readSwitchState1());  // UART initialisieren
-	  initSeg();
-	  initExIn();
+    char choice;
+    sek = 215990;  // Initiale Zeit setzen
+
+    // Initialisierungen
+    uartInit(initBaudrate(), 8, readSwitchState3(), readSwitchState2(), readSwitchState1());
+    initSeg();
+    initExIn();
     initTimer();
-		
+
+    // Hauptschleife
     while (1) {
-			    sendMenu();
-          choice = uartReadChar();
+        sendMenu();
+        choice = uartReadChar();
+
         switch (choice) {
             case 's': case 'S':
                 T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;
@@ -191,25 +219,25 @@ int main(void) {
                 sendTime(sek);
                 break;
             case 'r': case 'R':
-                if (T0TCR==0x01){						// Wenn Timer läuft
-													uartSendString ("Sie muessen die Stoppuhr erst anhalten, erst dann duerfen Sie sie zuruecksetzen");
-													uartSendString("\r\n");
-									} else {						// sonst
-													T0TCR=0x02;			   				// Timer rücksetzen
-													sek = 0;	
-													uartSendString("Timer wurde erfolgreich zurückgesetzt!");
-									}
+                if (T0TCR == 0x01) {
+                    uartSendString("Sie muessen die Stoppuhr erst anhalten, erst dann duerfen Sie sie zuruecksetzen\r\n");
+                } else {
+                    T0TCR = 0x02;  // Timer zurücksetzen
+                    sek = 0;
+                    uartSendString("Timer wurde erfolgreich zurückgesetzt!\r\n");
+                }
                 break;
             default:
                 uartSendString("Ungültige Eingabe!\r\n");
                 break;
         }
-				if (sek >= 215999){
-						T0TCR=0x00;									// Timer angehalten
-						T0TCR=0x02;			   						// Timer rücksetzen
-						sek = 0;								// Sekunden zurücksetzen
-						uartSendString ("aktuelle Timer-Zeit: 59:59:59. Stoppuhr wurde angehalten und zurueckgesetzt");
-						uartSendString("\r\n");
-		}
+
+        // Zeitgrenze prüfen und zurücksetzen
+        if (sek >= 215999) {
+            T0TCR = 0x00;  // Timer anhalten
+            T0TCR = 0x02;  // Timer zurücksetzen
+            sek = 0;
+            uartSendString("aktuelle Timer-Zeit: 59:59:59. Stoppuhr wurde angehalten und zurueckgesetzt\r\n");
+        }
     }
 }
