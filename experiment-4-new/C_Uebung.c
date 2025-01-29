@@ -117,6 +117,8 @@ void initTimer(void) {
 void initExIn(void) {
     PINSEL0 |= 0x80000000;  // EINT2 aktivieren
     EXTMODE |= 0x04;        // Flankengesteuerter Interrupt
+	  EXTPOLAR |= 0x04;
+	  EXTINT 	|= 0x04;
     VICVectCntl0 = 0x30;    // Kanal 16 aktivieren
     VICVectAddr0 = (unsigned long)myEXTINT;
     VICIntEnable = 0x10000; // EINT2 aktivieren
@@ -146,15 +148,9 @@ void sendInt(int value) {
 
 // Externer Interrupt-Handler
 void myEXTINT(void) __irq {
-    static unsigned int tasterzustand = 0;
-
-    if (tasterzustand > 0) {
-        T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;  // Timer starten oder anhalten
-        uartSendString((T0TCR == 0x01) ? "Timer gestartet!\r\n" : "Timer angehalten!\r\n");
-        tasterzustand = 0;
-    } else {
-        tasterzustand++;
-    }
+	
+   	T0TCR = (T0TCR == 0x01) ? 0x00 : 0x01;  // Timer starten oder anhalten
+	  uartSendString((T0TCR == 0x01) ? "Timer gestartet!\r\n" : "Timer angehalten!\r\n");
 
     EXTINT = 0x04;  // Interrupt-Flag löschen
     VICVectAddr = 0x00;
@@ -224,7 +220,7 @@ int main(void) {
                 } else {
                     T0TCR = 0x02;  // Timer zurücksetzen
                     sek = 0;
-                    uartSendString("Timer wurde erfolgreich zurückgesetzt!\r\n");
+                    uartSendString("Timer wurde erfolgreich zurueckgesetzt!\r\n");
                 }
                 break;
             default:
