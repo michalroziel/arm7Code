@@ -1,11 +1,11 @@
 /********************************************************************/
 /*  Hochschule fuer Technik und Wirtschaft                          */
-/*  Fakultät fuer Ingenieurwissenschaften                           */
+/*  FakultÃ¤t fuer Ingenieurwissenschaften                           */
 /*  Labor fuer Eingebettete Systeme                                 */
 /*  Mikroprozessortechnik                                           */
 /********************************************************************/
 /*                                                                  */
-/*  C_Uebung.h: Header-Datei für die Implementierungsdatei          */
+/*  C_Uebung.h: Header-Datei fÃ¼r die Implementierungsdatei          */
 /********************************************************************/
 
 #ifndef C_UEBUNG_H
@@ -22,15 +22,15 @@
 #define DLAB_BIT 128                 // DLAB-Bit setzen (7. Bit)
 #define UART_PINSEL_CONFIG 0x50000  // P0.8 = TxD1, P0.9 = RxD1
 #define UART_READY_BIT 0x20         // Ready-Bit im UART
-#define UART_FIFO_ENABLE 0x07        // FIFO aktivieren und zurücksetzen
+#define UART_FIFO_ENABLE 0x07        // FIFO aktivieren und zurÃ¼cksetzen
 #define UART_RX_READY 0x01          // RX-Ready-Bit
-#define HEX_DIGIT_LIMIT 8           // Maximale Länge der Hex-Eingabe
+#define HEX_DIGIT_LIMIT 8           // Maximale LÃ¤nge der Hex-Eingabe
 #define CR_LF "\r\n"               // Carriage Return + Line Feed
-#define INVALID_HEX_VALUE 0xFFFFFFFF // Ungültiger Hex-Wert
+#define INVALID_HEX_VALUE 0xFFFFFFFF // UngÃ¼ltiger Hex-Wert
 
 /* ======================== Globale Variablen ======================== */
 
-unsigned int sek = 0;        // Sekunden-Zähler
+volatile unsigned int sek;        // Sekunden-ZÃ¤hler
 
 unsigned long bcd[10] = {
     0x0FC0000, 0x180000, 0x16C0000, 0x13C0000, 0x1980000,
@@ -61,8 +61,8 @@ void T0isr(void) __irq;               // Timer-Interrupt-Handler
 
 // UART-Funktionen
 void uartInit(unsigned int baudRate, unsigned int dataBits, unsigned int stopBits, unsigned int paritySelect, unsigned int parityEnable); // UART initialisieren
-void uartSendChar(char data);         // Zeichen über UART senden
-void uartSendString(char* str);       // String über UART senden
-char uartReadChar(void);              // Zeichen über UART empfangen
+void uartSendChar(char data);         // Zeichen Ã¼ber UART senden
+void uartSendString(char* str);       // String Ã¼ber UART senden
+char uartReadChar(void);              // Zeichen Ã¼ber UART empfangen
 
 #endif /* C_UEBUNG_H */
