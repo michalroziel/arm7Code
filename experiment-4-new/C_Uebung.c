@@ -118,8 +118,6 @@ void initTimer(void) {
 void initExIn(void) {
     PINSEL0  |= 0x80000000;      // EINT2 aktivieren -> Func. 01
     EXTMODE  |= 0x04;       		 // Flankengesteuerter INT. Bit 2
-	  EXTPOLAR |= 0x04;            // EINT2 -> rising edge
-	  EXTINT 	 |= 0x04;            // Interrupt Flag 
 	  VICVectCntl0 = 0x30;    		 // Kanal 16 : Bit5 :VekKanal, 4: Int.ID
     VICVectAddr0 = (unsigned long)myEXTINT; // save addr. der isr
     VICIntEnable = 0x10000; 		 // EINT2 aktivieren
@@ -178,10 +176,11 @@ void T0isr(void) __irq {
 }
 
 // Zeit über UART senden
-void sendTime(int time) {       
-    int h = time / 3600;         // Stunden berechnen 
-    int m = (time % 3600) / 60;  // Minuten berechnen  
-    int s = time % 60;           // Sekunden berechnen 
+void sendTime(void) { 
+		
+    int h = sek / 3600;         // Stunden berechnen 
+    int m = (sek % 3600) / 60;  // Minuten berechnen  
+    int s = sek % 60;           // Sekunden berechnen 
 
     uartSendString("Zeit: ");
     if (h < 10) sendInt(0);      // falls h< 10, führende Null 
@@ -205,7 +204,7 @@ void initSeg(void) {
 // Hauptprogramm
 int main(void) {
     char choice;
-    sek = 215990;      // Initiale Zeit setzen
+    sek = 0;      // Initiale Zeit setzen
 
     // Initialisierungen 
     uartInit(initBaudrate(), 8, readSwitchState3(), readSwitchState2(), readSwitchState1());
@@ -227,7 +226,7 @@ int main(void) {
                 break;
             case 'a': case 'A':
 												// Zeit anzeigen lassen
-                sendTime(sek);
+                sendTime();
                 break;
 												// Timer-Reset
             case 'r': case 'R':
